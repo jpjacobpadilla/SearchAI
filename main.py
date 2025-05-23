@@ -1,6 +1,3 @@
-def main():
-    print("Hello from searchai!")
+from search_ai import search
 
-
-if __name__ == "__main__":
-    main()
+search('jacob padilla')
