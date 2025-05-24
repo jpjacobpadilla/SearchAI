@@ -11,9 +11,9 @@ BASE_URL = 'https://www.google.com/search'
 
 
 def search(
-        query: str,
-        mode: Literal['news'] | Literal['search'] = 'search',
+        query: str = '',
         filters: Filters | None = None,
+        mode: Literal['news'] | Literal['search'] = 'search',
         length: int = 5,
         offset: int = 0,
         unique: bool = False,
