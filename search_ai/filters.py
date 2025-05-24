@@ -61,7 +61,7 @@ class Filters(BaseModel):
     not_in_url: str | list[str] | None = Field(None, description="Exclude pages with specific words in the URL")
     not_in_text: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
 
-    @field_validator('tlds', mode='before')
+    @field_validator('tlds', 'exclude_tlds', mode='before')
     @classmethod
     def validate_tld(cls, v: str | list[str] | None):
         if not v:
