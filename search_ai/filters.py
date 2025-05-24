@@ -59,7 +59,7 @@ class Filters(BaseModel):
     exclude_url_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the URL")
     exclude_text_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
 
-    @field_validator('tld', mode='before')
+    @field_validator('tlds', mode='before')
     @classmethod
     def validate_tld(cls, v: str | list[str] | None):
         if not v:
@@ -83,8 +83,9 @@ class Filters(BaseModel):
         filters.append(group_includes(to_list(self.filetype), "filetype"))
         filters.append(group_includes(to_list(self.keywords)))
 
-        phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
-        filters.extend([f'"{phrase}"' for phrase in phrase_list])
+        if self.exact_phrases:
+            phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
+            filters.extend([f'"{phrase}"' for phrase in phrase_list])
 
         if self.https_only:
             filters.append("inurl:https")
@@ -99,8 +100,9 @@ class Filters(BaseModel):
             filters.append(f"after:{self.after.isoformat()}")
 
         # Negative Filters
-        phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
-        filters.extend([f'-"{phrase}"' for phrase in phrase_list])
+        if self.exclude_exact_phrases:
+            phrase_list = self.exclude_exact_phrases if isinstance(self.exclude_exact_phrases, list) else [self.exclude_exact_phrases]
+            filters.extend([f'-"{phrase}"' for phrase in phrase_list])
 
         filters.extend(group_excludes("site", to_list(self.exclude_sites)))
         filters.extend(group_excludes("site", to_list(self.exclude_tlds)))
