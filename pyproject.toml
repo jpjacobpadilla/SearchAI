@@ -1,13 +1,18 @@
 [project]
-name = "searchai"
+name = "SearchAI"
 version = "0.1.0"
-description = "Add your description here"
+description = "Google Search & News tool with advanced filters and LLM-friendly output formats!"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "httpx>=0.28.1",
     "lxml>=5.4.0",
-    "notebook>=7.4.2",
+    "publicsuffix2>=2.20191221",
     "pydantic>=2.11.5",
-    "validators>=0.35.0",
+    "tenacity>=9.1.2"
+]
+
+[dependency-groups]
+dev = [
+    "notebook>=7.4.2",
 ]
