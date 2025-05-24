@@ -1,12 +1,15 @@
 from datetime import date
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from pydantic.types import StringConstraints
+from publicsuffix2 import PublicSuffixList
 
 
 FileType = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9]{2,10}$")]
 Keyword = Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]
+
+psl = PublicSuffixList()
 
 def to_list(val: str | list[str] | None) -> list[str]:
     if val is None:
@@ -55,6 +58,21 @@ class Filters(BaseModel):
     exclude_title_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the title")
     exclude_url_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the URL")
     exclude_text_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
+
+    @field_validator('tld', mode='before')
+    @classmethod
+    def validate_tld(cls, v: str | list[str] | None):
+        if not v:
+            return v
+
+        valid_tlds = [
+            psl.get_tld(tld, strict=True)
+            for tld in (v if isinstance(v, list) else [v])
+        ]
+
+        if all(valid_tlds):
+            return v
+        raise ValueError(f'{v} is an invalid top level domain according to https://publicsuffix.org')
 
     def compile_filters(self) -> str:
         filters = []
