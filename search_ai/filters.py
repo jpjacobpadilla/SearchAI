@@ -82,7 +82,10 @@ class Filters(BaseModel):
             filters.append(f"after:{self.after.isoformat()}")
 
         # Negative Filters
-        filters.extend([f'-"{phrase}"' for phrase in to_list(self.exclude_exact_phrases)])
+        if isinstance(self.exact_phrases, str):
+            filters.append(f'-"{self.exact_phrases}"')
+        elif isinstance(self.exact_phrases, list):
+            filters.extend([f'-"{phrase}"' for phrase in self.exact_phrases])
 
         filters.extend(group_excludes("site", to_list(self.exclude_sites)))
         filters.extend(group_excludes("site", to_list(self.exclude_tlds)))
