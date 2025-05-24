@@ -67,6 +67,6 @@ from search_ai import Filters
     ('not_in_text', ['ads', 'popup'], '-intext:ads -intext:popup')
 ])
 def test_individual_fields(field, value, expected):
-    filter = Filters(**{field: value})
-    compiled_filters = filter.compile_filters()
+    filter_obj = Filters(**{field: value})
+    compiled_filters = filter_obj.compile_filters()
     assert compiled_filters == expected
