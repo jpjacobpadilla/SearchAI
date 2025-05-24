@@ -15,4 +15,5 @@ dependencies = [
 [dependency-groups]
 dev = [
     "notebook>=7.4.2",
+    "pytest>=8.3.5",
 ]
