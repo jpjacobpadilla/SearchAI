@@ -1,6 +1,7 @@
 from datetime import date
 
 import pytest
+import pydantic
 
 from search_ai import Filters
 
@@ -70,3 +71,27 @@ def test_individual_fields(field, value, expected):
     filter_obj = Filters(**{field: value})
     compiled_filters = filter_obj.compile_filters()
     assert compiled_filters == expected
+
+
+@pytest.mark.parametrize("field, value", [
+    ("filetype", "toolongfilename123"),
+    ("filetype", "we!rd"),
+
+    ("exclude_filetypes", "we!rd"),
+    ("exclude_filetypes", ["bad!", "!!"]),
+
+    ("keywords", "with space"),
+    ("keywords", ["ok", "bad word"]),
+
+    ("exclude_keywords", "white space"),
+    ("exclude_keywords", ["fine", "break this"]),
+
+    ("tlds", ".invalidtld"),
+    ("tlds",  [".edu", ".badzone"]),
+
+    ("exclude_tlds", ".invalidtld"),
+    ("exclude_tlds", [".edu", ".badzone"])
+])
+def test_field_validation(field, value):
+    with pytest.raises(ValueError, match=".*"):
+        Filters(**{field: value})
