@@ -3,9 +3,13 @@ import random
 from typing import Literal
 
 import httpx
+from tenacity import (
+    retry, stop_after_attempt,
+    wait_exponential, retry_if_exception_type
+)
 
 from .filters import Filters
-
+from .utils import parse_search
 
 BASE_URL = 'https://www.google.com/search'
 
@@ -33,10 +37,8 @@ def search(
 
     while len(results) < length:
         response = _request(compiled_query, mode, length + 1, lang, offset, safe, region, proxy)
-        response.raise_for_status()
 
-        from .utils import parse_search
-        new_results = parse_search(response.text)
+        new_results = parse_search(response)
 
         for new_result in new_results:
             if unique:
@@ -54,6 +56,12 @@ def search(
 
     return results
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+    retry=retry_if_exception_type(httpx.HTTPError),
+    reraise=True
+)
 def _request(
         query: str,
         mode: Literal['news'] | Literal['search'],
@@ -63,7 +71,8 @@ def _request(
         safe: bool,
         region: str | None,
         proxy: str | None
-) -> httpx.Response:
+) -> str:
+    print('attempt 1')
     params = {
         'q': query,
         'num': number,
@@ -88,8 +97,10 @@ def _request(
         'User-Agent': generate_useragent()
     }
 
-    resp = httpx.get(BASE_URL, params=params, headers=headers, cookies=cookies, proxy=proxy)
-    return resp
+    with httpx.Client(proxy=proxy, headers=headers, cookies=cookies) as client:
+        resp = client.get(BASE_URL, params=params)
+        resp.raise_for_status()
+        return resp.text
 
 
 def generate_useragent():
