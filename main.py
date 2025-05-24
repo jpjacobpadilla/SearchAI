@@ -1,3 +1,4 @@
 from search_ai import search
 
-search('jacob padilla')
+for x in search('vpn'):
+    print(x)

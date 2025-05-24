@@ -1,3 +1,4 @@
+import time
 import random
 from typing import Literal
 
@@ -12,28 +13,46 @@ BASE_URL = 'https://www.google.com/search'
 def search(
         query: str,
         mode: Literal['news'] | Literal['search'] = 'search',
-        operators: Filters | None = None,
-        length: int = 10,
+        filters: Filters | None = None,
+        length: int = 5,
         offset: int = 0,
         unique: bool = False,
         safe: bool = True,
         lang: str = 'en',
         region: str | None = None,
-        proxy: str | None = None
+        proxy: str | None = None,
+        sleep_time: int = 1
 ):
     assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
 
-    results = []
-    while len(results) < length:
-        number = 10
+    filters = filters.compile_filters() if filters else ''
+    compiled_query = f'{query}{" " if filters else ""}{filters}'
 
-        response = _request(query, mode, number, lang, offset, safe, region, proxy)
+    results = []
+    result_set = set()
+
+    while len(results) < length:
+        response = _request(compiled_query, mode, length + 1, lang, offset, safe, region, proxy)
         response.raise_for_status()
 
         from .utils import parse_search
-        results = parse_search(response.text)
-        for result in results:
-            print(result)
+        new_results = parse_search(response.text)
+
+        for new_result in new_results:
+            if unique:
+                if new_result.link in result_set:
+                    continue
+                else:
+                    result_set.add(new_result.link)
+
+            results.append(new_result)
+            if len(results) == length:
+                return results
+
+        twenty_percent = sleep_time * .20
+        time.sleep(random.uniform(sleep_time - twenty_percent, sleep_time + twenty_percent))
+
+    return results
 
 def _request(
         query: str,
