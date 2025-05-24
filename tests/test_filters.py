@@ -94,3 +94,86 @@ def test_individual_fields(field, value, expected):
 def test_field_validation(field, value):
     with pytest.raises(ValueError, match=".*"):
         Filters(**{field: value})
+
+
+@pytest.mark.parametrize("kwargs, expected", [
+    (
+        {"sites": "example.com", "keywords": "ai"},
+        'site:example.com "ai"'
+    ),
+    (
+        {
+            "sites": ["a.com", "b.com"],
+            "filetype": "pdf",
+            "exact_phrases": ["openai api", "machine learning"],
+            "https_only": True,
+            "in_title": ["research", "ai"],
+        },
+        '(site:a.com | site:b.com) filetype:pdf "openai api" "machine learning" inurl:https intitle:research intitle:ai'
+    ),
+    (
+        {
+            "exclude_sites": ["spam.com"],
+            "exclude_keywords": ["ads", "clickbait"],
+            "not_in_url": "ref",
+            "exclude_https": True
+        },
+        '-site:spam.com -inurl:https -ads -clickbait -inurl:ref'
+    ),
+    (
+        {
+            "tlds": [".gov", ".edu"],
+            "before": date(2020, 1, 1),
+            "after": date(2010, 5, 10),
+            "in_text": ["compliance", "report"],
+            "exclude_tlds": [".xyz"],
+        },
+        '(site:.gov | site:.edu) intext:compliance intext:report before:2020-01-01 after:2010-05-10 -site:.xyz'
+    ),
+    (
+        {
+            "filetype": "ppt",
+            "exclude_filetypes": ["exe", "bat"],
+            "keywords": ["presentation", "slides"],
+        },
+        'filetype:ppt ("presentation" | "slides") -filetype:exe -filetype:bat'
+    ),
+    (
+        {
+            "in_url": "docs",
+            "in_title": "introduction",
+            "exclude_exact_phrases": "outdated info"
+        },
+        'intitle:introduction inurl:docs -"outdated info"'
+    ),
+    (
+        {
+            "sites": "example.org",
+            "in_text": "summary",
+            "exclude_keywords": "draft"
+        },
+        'site:example.org intext:summary -draft'
+    ),
+    (
+        {
+            "sites": ["news.com", "media.com"],
+            "in_url": ["breaking", "live"],
+            "not_in_text": ["subscribe", "cookie"]
+        },
+        '(site:news.com | site:media.com) inurl:breaking inurl:live -intext:subscribe -intext:cookie'
+    ),
+    (
+        {
+            "exact_phrases": "deep learning",
+            "exclude_exact_phrases": "deprecated method",
+            "in_title": "tutorial",
+            "not_in_title": "sponsored"
+        },
+        '"deep learning" intitle:tutorial -"deprecated method" -intitle:sponsored'
+    )
+])
+def test_combined_fields(kwargs, expected):
+    filter_obj = Filters(**kwargs)
+    compiled_filters = filter_obj.compile_filters()
+    assert compiled_filters == expected
+
