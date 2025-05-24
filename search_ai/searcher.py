@@ -58,7 +58,7 @@ def search(
 
 @retry(
     stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1, min=1, max=10),
+    wait=wait_exponential(multiplier=1.5, min=1, max=10),
     retry=retry_if_exception_type(httpx.HTTPError),
     reraise=True
 )
@@ -72,7 +72,6 @@ def _request(
         region: str | None,
         proxy: str | None
 ) -> str:
-    print('attempt 1')
     params = {
         'q': query,
         'num': number,
