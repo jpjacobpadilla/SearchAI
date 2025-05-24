@@ -5,14 +5,34 @@ from pydantic import BaseModel, Field
 from pydantic.types import StringConstraints
 
 
-TLD = Annotated[str, StringConstraints(pattern=r"^\.[a-zA-Z]{2,}$")]
 FileType = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9]{2,10}$")]
 Keyword = Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]
+
+def to_list(val: str | list[str] | None) -> list[str]:
+    if val is None:
+        return []
+    return val.split(' ') if isinstance(val, str) else val
+
+
+def group_includes(values: list[str], op: str | None = None) -> str:
+    if not values:
+        return ""
+
+    if len(values) == 1:
+        return f"{op}:{values[0]}" if op else f'"{values[0]}"'
+
+    if op:
+        return f'({' | '.join(f'{op}:{v}' for v in values)})'
+    return f'({' | '.join(f'"{v}"' for v in values)})'
+
+
+def group_excludes(op: str, values: list[str]) -> list[str]:
+    return [f"-{op}:{v}" for v in values]
 
 
 class Filters(BaseModel):
     sites: str | list[str] | None = Field(None, description="Only show results from specific domains")
-    tlds: TLD | list[TLD] | None = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
+    tlds: str | list[str] | None = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
     filetype: FileType | None = Field(None, description="Only show documents that are a specific file type")
     https_only: bool = Field(False, description="Only show websites that support HTTPS")
 
@@ -26,7 +46,7 @@ class Filters(BaseModel):
     after: date | None = Field(None, description="Only show results after this date")
 
     exclude_sites: str | list[str] | None = Field(None, description="Exclude results from specific domains")
-    exclude_tlds: TLD | list[TLD] | None = Field(None, description="Exclude results from specific top-level domains")
+    exclude_tlds: str | list[str] | None = Field(None, description="Exclude results from specific top-level domains")
     exclude_filetypes: FileType | list[FileType] | None = Field(None, description="Exclude documents with specific file types")
     exclude_https: bool = Field(False, description="Exclude HTTPS pages")
 
@@ -37,25 +57,6 @@ class Filters(BaseModel):
     exclude_text_words: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
 
     def compile_filters(self) -> str:
-        def to_list(val: str | list[str] | None) -> list[str]:
-            if val is None:
-                return []
-            return val.split(' ') if isinstance(val, str) else val
-
-        def group_includes(values: list[str], op: str | None = None) -> str:
-            if not values:
-                return ""
-
-            if len(values) == 1:
-                return f"{op}:{values[0]}" if op else f'"{values[0]}"'
-
-            if op:
-                return f'({ ' | '.join(f'{op}:{v}' for v in values) })'
-            return f'({' | '.join(f'"{v}"' for v in values)})'
-
-        def group_excludes(op: str, values: list[str]) -> list[str]:
-            return [f"-{op}:{v}" for v in values]
-
         filters = []
 
         filters.append(group_includes(to_list(self.sites), 'site'))
