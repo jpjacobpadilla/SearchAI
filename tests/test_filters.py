@@ -1,7 +1,6 @@
 from datetime import date
 
 import pytest
-import pydantic
 
 from search_ai import Filters
 
