@@ -36,7 +36,7 @@ def group_excludes(op: str, values: list[str]) -> list[str]:
 class Filters(BaseModel):
     sites: str | list[str] | None = Field(None, description="Only show results from specific domains")
     tlds: str | list[str] | None = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
-    filetype: FileType | None = Field(None, description="Only show documents that are a specific file type")
+    filetype: FileType | None = Field(None, description="Only show documents that are a specific file type. Note: Google only supports one filetype per search.")
     https_only: bool = Field(False, description="Only show websites that support HTTPS")
 
     exclude_sites: str | list[str] | None = Field(None, description="Exclude results from specific domains")
