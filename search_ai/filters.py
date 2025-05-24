@@ -64,10 +64,8 @@ class Filters(BaseModel):
         filters.append(group_includes(to_list(self.filetype), "filetype"))
         filters.append(group_includes(to_list(self.keywords)))
 
-        if isinstance(self.exact_phrases, str):
-            filters.append(f'"{self.exact_phrases}"')
-        elif isinstance(self.exact_phrases, list):
-            filters.extend([f'"{phrase}"' for phrase in self.exact_phrases])
+        phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
+        filters.extend([f'"{phrase}"' for phrase in phrase_list])
 
         if self.https_only:
             filters.append("inurl:https")
@@ -82,10 +80,8 @@ class Filters(BaseModel):
             filters.append(f"after:{self.after.isoformat()}")
 
         # Negative Filters
-        if isinstance(self.exact_phrases, str):
-            filters.append(f'-"{self.exact_phrases}"')
-        elif isinstance(self.exact_phrases, list):
-            filters.extend([f'-"{phrase}"' for phrase in self.exact_phrases])
+        phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
+        filters.extend([f'-"{phrase}"' for phrase in phrase_list])
 
         filters.extend(group_excludes("site", to_list(self.exclude_sites)))
         filters.extend(group_excludes("site", to_list(self.exclude_tlds)))
