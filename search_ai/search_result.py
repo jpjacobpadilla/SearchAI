@@ -25,7 +25,7 @@ class BaseSearchResult(BaseModel):
         """
         This is here to hide _proxy, which is more of an implementation detail.
         """
-        return f"{self.__class__}(title={self.title!r}, link={self.link!r}, description={self.description!r})"
+        return f"{self.__class__.__name__}(title={self.title!r}, link={self.link!r}, description={self.description!r})"
 
     def __repr__(self):
         return self.__str__()
