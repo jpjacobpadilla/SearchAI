@@ -224,7 +224,7 @@ class SearchResults(list):
     def markdown(
         self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> str:
-        content = ["# Search Results:"]
+        content = []
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
@@ -242,7 +242,7 @@ class SearchResults(list):
                     )
                 )
 
-        return "\n\n".join(content)
+        return "# Search Results\n\n" + "\n\n----------\n\n".join(content)
 
     def json(
         self, extend: bool = True, content_length: int = 400, **kwargs
@@ -276,7 +276,7 @@ class AsyncSearchResults(list):
     async def markdown(
         self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> str:
-        content = ["# Search Results:"]
+        content = []
 
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
@@ -294,7 +294,7 @@ class AsyncSearchResults(list):
                     )
                 )
 
-        return "\n\n".join(content)
+        return "# Search Results\n\n" + "\n\n----------\n\n".join(content)
 
     async def json(
         self, extend: bool = True, content_length: int = 400, **kwargs
