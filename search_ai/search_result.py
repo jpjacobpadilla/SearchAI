@@ -8,6 +8,10 @@ from playwright.async_api import async_playwright, Browser as AsyncBrowser
 
 
 class BaseSearchResult:
+    title: str
+    link: HttpUrl
+    description: str | None = None
+
     def _basic_markdown(self) -> str:
         parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
         if self.description:
@@ -81,10 +85,6 @@ class BaseSearchResult:
 
 
 class SearchResult(BaseModel, BaseSearchResult):
-    title: str
-    link: HttpUrl
-    description: str | None = None
-
     def markdown(
         self,
         extend: bool = True,
@@ -139,10 +139,6 @@ class SearchResult(BaseModel, BaseSearchResult):
 
 
 class AsyncSearchResult(BaseModel, BaseSearchResult):
-    title: str
-    link: HttpUrl
-    description: str | None = None
-
     async def markdown(
         self,
         extend: bool = True,
