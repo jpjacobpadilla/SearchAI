@@ -1,3 +1,5 @@
+import mimetypes
+
 import html2text
 from lxml import html
 
@@ -23,6 +25,7 @@ def extract_metadata(page_source: str) -> dict:
 
     return result
 
+
 def generate_markdown(
         page_source: str, ignore_links: bool, ignore_images: bool
 ) -> str:
@@ -31,4 +34,14 @@ def generate_markdown(
     text_maker.ignore_images = ignore_images
     text_maker.body_width = 0  # Prevent automatic wrapping
     return text_maker.handle(page_source)
+
+
+def valid_type(url: str) -> bool:
+    """
+    Currently, only text / html pages are supported for extended data retrival.
+    """
+    mime, _ = mimetypes.guess_type(url)
+    return mime in ('text/html', 'text/plain', 'application/xhtml+xml', None)
+
+
 

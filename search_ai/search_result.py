@@ -1,6 +1,6 @@
-from typing import Generator, Any, AsyncGenerator
+from typing import  Any
 
-from .utils import extract_metadata, generate_markdown
+from .utils import extract_metadata, generate_markdown, valid_type
 
 from pydantic import BaseModel, HttpUrl
 from playwright.sync_api import Browser, sync_playwright
@@ -94,7 +94,7 @@ class SearchResult(BaseSearchResult):
         only_page_content: bool = False,
         browser: Browser | None = None,
     ) -> str:
-        if not extend:
+        if not extend or not valid_type(str(self.link)):
             return self._basic_markdown()
 
         page_source = self._get_page_source(browser)
@@ -111,7 +111,7 @@ class SearchResult(BaseSearchResult):
         ignore_images: bool = True,
         **kwargs: Any,
     ) -> dict:
-        if not extend:
+        if not extend or not valid_type(str(self.link)):
             return super().model_dump(**kwargs)
 
         page_source = self._get_page_source(browser)
@@ -148,7 +148,7 @@ class AsyncSearchResult(BaseSearchResult):
         only_page_content: bool = False,
         browser: AsyncBrowser | None = None,
     ) -> str:
-        if not extend:
+        if not extend or not valid_type(str(self.link)):
             return self._basic_markdown()
 
         page_source = await self._get_page_source(browser)
@@ -165,7 +165,7 @@ class AsyncSearchResult(BaseSearchResult):
         ignore_images: bool = True,
         **kwargs: Any,
     ) -> dict:
-        if not extend:
+        if not extend or not valid_type(str(self.link)):
             return super().model_dump(**kwargs)
 
         page_source = await self._get_page_source(browser)
