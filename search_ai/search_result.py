@@ -4,7 +4,7 @@ from .utils import extract_metadata, generate_markdown
 
 from pydantic import BaseModel, HttpUrl
 from playwright.sync_api import Browser, sync_playwright
-from playwright.async_api import async_playwright
+from playwright.async_api import async_playwright, Browser as AsyncBrowser
 
 
 class BaseSearchResult:
@@ -123,10 +123,13 @@ class SearchResult(BaseModel, BaseSearchResult):
             return self._use_playwright(browser)
 
     def _use_playwright(self, browser: Browser) -> str:
-        page = browser.new_page()
+        context = browser.new_context()
+        page = context.new_page()
+
         page.goto(str(self.link), wait_until="load")
         page_source = page.content()
         page.close()
+        context.close()
         return page_source
 
 
@@ -142,7 +145,7 @@ class AsyncSearchResult(BaseModel):
             ignore_links: bool = False,
             ignore_images: bool = True,
             only_page_content: bool = False,
-            browser: Browser | None = None,
+            browser: AsyncBrowser | None = None,
     ) -> str:
         if not extend:
             return self._basic_markdown()
@@ -154,7 +157,7 @@ class AsyncSearchResult(BaseModel):
             self,
             extend: bool = False,
             content_length: int = 1_000,
-            browser: Browser | None = None,
+            browser: AsyncBrowser | None = None,
             ignore_links: bool = False,
             ignore_images: bool = True,
             **kwargs: Any,
@@ -165,7 +168,7 @@ class AsyncSearchResult(BaseModel):
         page_source = await self._get_page_source(browser)
         return self._extended_json(page_source, content_length, ignore_links, ignore_images)
 
-    async def _get_page_source(self, browser: Browser | None = None) -> str:
+    async def _get_page_source(self, browser: AsyncBrowser | None = None) -> str:
         if browser:
             return await self._use_playwright(browser)
 
@@ -173,11 +176,14 @@ class AsyncSearchResult(BaseModel):
             browser = await playwright.chromium.launch(headless=True)
             return await self._use_playwright(browser)
 
-    async def _use_playwright(self, browser: Browser) -> str:
-        page = await browser.new_page()
+    async def _use_playwright(self, browser: AsyncBrowser) -> str:
+        context = await browser.new_context()
+        page = await context.new_page()
+
         await page.goto(str(self.link), wait_until="load")
         page_source = await page.content()
-        page.close()
+        await page.close()
+        await context.close()
         return page_source
 
 
