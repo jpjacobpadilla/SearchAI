@@ -9,7 +9,7 @@ from tenacity import (
 )
 
 from .filters import Filters
-from .utils import parse_search
+from .parse import parse_search
 
 BASE_URL = 'https://www.google.com/search'
 
