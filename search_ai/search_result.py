@@ -66,9 +66,10 @@ class BaseSearchResult(BaseModel):
         if metadata.get('twitter'):
             parts.append(f"**Twitter:** {metadata['twitter']}")
 
-        parts.append("")  # Extra break between metadata and page data
-        parts.append("## Page Preview:\n")
-        parts.append(markdown[:content_length].strip())
+        if markdown:
+            parts.append("")  # Extra break between metadata and page data
+            parts.append("## Page Preview:\n")
+            parts.append(markdown[:content_length].strip())
 
         return "\n".join(parts)
 
@@ -97,7 +98,8 @@ class BaseSearchResult(BaseModel):
         if metadata.get('twitter'):
             combined_data["twitter"] = metadata["twitter"]
 
-        combined_data["page_preview"] = markdown[:content_length]
+        if markdown:
+            combined_data["page_preview"] = markdown[:content_length]
 
         return combined_data
 
