@@ -1,10 +1,18 @@
 from typing import  Any
 
 from .utils import extract_metadata, generate_markdown, valid_type
+from .proxy import Proxy
 
 from pydantic import BaseModel, HttpUrl
 from playwright.sync_api import Browser, sync_playwright
 from playwright.async_api import async_playwright, Browser as AsyncBrowser
+
+
+playwright_config = {
+    'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'viewport': {'width': 1280, 'height': 720},
+    'locale': 'en-US'
+}
 
 
 class BaseSearchResult(BaseModel):
@@ -124,7 +132,11 @@ class SearchResult(BaseSearchResult):
             return self._use_playwright(browser)
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
             return self._use_playwright(browser)
 
     def _use_playwright(self, browser: Browser) -> str:
@@ -178,7 +190,11 @@ class AsyncSearchResult(BaseSearchResult):
             return await self._use_playwright(browser)
 
         async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(headless=True)
+            browser = await playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
             return await self._use_playwright(browser)
 
     async def _use_playwright(self, browser: AsyncBrowser) -> str:
@@ -193,7 +209,7 @@ class AsyncSearchResult(BaseSearchResult):
 
 
 class SearchResults(list):
-    def __init__(self, results: list[SearchResult], proxy: str = ""):
+    def __init__(self, results: list[SearchResult], proxy: Proxy | None):
         super().__init__(results)
         self.proxy = proxy
 
@@ -203,7 +219,11 @@ class SearchResults(list):
         content = ["# Search Results:"]
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
 
             for result in self:
                 content.append(
@@ -223,7 +243,11 @@ class SearchResults(list):
         data = []
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch(headless=True)
+            browser = playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
 
             for result in self:
                 data.append(
@@ -239,7 +263,7 @@ class SearchResults(list):
 
 
 class AsyncSearchResults(list):
-    def __init__(self, results: list[AsyncSearchResult], proxy: str = ""):
+    def __init__(self, results: list[AsyncSearchResult], proxy: Proxy| None):
         super().__init__(results)
         self.proxy = proxy
 
@@ -249,7 +273,11 @@ class AsyncSearchResults(list):
         content = ["# Search Results:"]
 
         async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(headless=True)
+            browser = await playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
 
             for result in self:
                 content.append(
@@ -269,7 +297,11 @@ class AsyncSearchResults(list):
         data = []
 
         async with async_playwright() as playwright:
-            browser = await playwright.chromium.launch(headless=True)
+            browser = await playwright.chromium.launch(
+                headless=True,
+                proxy=self.proxy.to_playwright_proxy(),
+                **playwright_config
+            )
 
             for result in self:
                 data.append(

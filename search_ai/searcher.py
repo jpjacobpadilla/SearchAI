@@ -8,6 +8,7 @@ from tenacity import (
     wait_exponential, retry_if_exception_type
 )
 
+from .proxy import Proxy
 from .filters import Filters
 from .parse import parse_search
 from .search_result import SearchResult, SearchResults
@@ -25,7 +26,7 @@ def search(
         safe: bool = True,
         lang: str = 'en',
         region: str | None = None,
-        proxy: str | None = None,
+        proxy: Proxy | None = None,
         sleep_time: int = 1
 ):
     assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
@@ -71,7 +72,7 @@ def _request(
         offset: int,
         safe: bool,
         region: str | None,
-        proxy: str | None
+        proxy: Proxy | None
 ) -> str:
     params = {
         'q': query,
@@ -97,7 +98,7 @@ def _request(
         'User-Agent': generate_useragent()
     }
 
-    with httpx.Client(proxy=proxy, headers=headers, cookies=cookies) as client:
+    with httpx.Client(proxy=proxy.to_httpx_proxy_url(), headers=headers, cookies=cookies) as client:
         resp = client.get(BASE_URL, params=params)
         resp.raise_for_status()
         return resp.text
