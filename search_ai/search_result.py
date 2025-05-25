@@ -21,6 +21,15 @@ class BaseSearchResult(BaseModel):
     description: str | None = None
     _proxy: Proxy | None = None
 
+    def __str__(self):
+        """
+        This is here to hide _proxy, which is more of an implementation detail.
+        """
+        return f"{self.__class__}(title={self.title!r}, link={self.link!r}, description={self.description!r})"
+
+    def __repr__(self):
+        return self.__str__()
+
     def _basic_markdown(self) -> str:
         parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
         if self.description:
