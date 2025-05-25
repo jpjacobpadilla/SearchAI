@@ -144,13 +144,12 @@ class SearchResult(BaseSearchResult):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
             return self._use_playwright(browser)
 
     def _use_playwright(self, browser: Browser) -> str:
-        context = browser.new_context()
+        context = browser.new_context(**PLAYWRIGHT_CONFIG)
         page = context.new_page()
 
         page.goto(str(self.link), wait_until="load")
@@ -202,13 +201,12 @@ class AsyncSearchResult(BaseSearchResult):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
             return await self._use_playwright(browser)
 
     async def _use_playwright(self, browser: AsyncBrowser) -> str:
-        context = await browser.new_context()
+        context = await browser.new_context(**PLAYWRIGHT_CONFIG)
         page = await context.new_page()
 
         await page.goto(str(self.link), wait_until="load")
@@ -231,8 +229,7 @@ class SearchResults(list):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
 
             for result in self:
@@ -255,8 +252,7 @@ class SearchResults(list):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
 
             for result in self:
@@ -285,8 +281,7 @@ class AsyncSearchResults(list):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
 
             for result in self:
@@ -309,8 +304,7 @@ class AsyncSearchResults(list):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
-                **PLAYWRIGHT_CONFIG
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None
             )
 
             for result in self:
