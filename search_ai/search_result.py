@@ -7,7 +7,7 @@ from playwright.sync_api import Browser, sync_playwright
 from playwright.async_api import async_playwright, Browser as AsyncBrowser
 
 
-class BaseSearchResult:
+class BaseSearchResult(BaseModel):
     title: str
     link: HttpUrl
     description: str | None = None
@@ -84,7 +84,7 @@ class BaseSearchResult:
         return combined_data
 
 
-class SearchResult(BaseModel, BaseSearchResult):
+class SearchResult(BaseSearchResult):
     def markdown(
         self,
         extend: bool = True,
@@ -138,7 +138,7 @@ class SearchResult(BaseModel, BaseSearchResult):
         return page_source
 
 
-class AsyncSearchResult(BaseModel, BaseSearchResult):
+class AsyncSearchResult(BaseSearchResult):
     async def markdown(
         self,
         extend: bool = True,
