@@ -217,7 +217,7 @@ class AsyncSearchResult(BaseSearchResult):
 
 
 class SearchResults(list):
-    def __init__(self, results: list[SearchResult], _proxy: Proxy | None):
+    def __init__(self, results: list[SearchResult], _proxy: Proxy | None = None):
         super().__init__(results)
         self._proxy = _proxy
 
@@ -269,7 +269,7 @@ class SearchResults(list):
 
 
 class AsyncSearchResults(list):
-    def __init__(self, results: list[AsyncSearchResult], _proxy: Proxy| None):
+    def __init__(self, results: list[AsyncSearchResult], _proxy: Proxy| None = None):
         super().__init__(results)
         self._proxy = _proxy
 
