@@ -15,12 +15,12 @@ class BaseSearchResult:
         return "\n".join(parts)
 
     def _extended_markdown(
-            self,
-            page_source: str,
-            only_page_content: bool,
-            content_length: int,
-            ignore_links: bool,
-            ignore_images: bool
+        self,
+        page_source: str,
+        only_page_content: bool,
+        content_length: int,
+        ignore_links: bool,
+        ignore_images: bool,
     ) -> str:
         markdown = generate_markdown(page_source, ignore_links, ignore_images)
 
@@ -51,11 +51,11 @@ class BaseSearchResult:
         return "\n".join(parts)
 
     def _extended_json(
-            self,
-            page_source: str,
-            content_length: int,
-            ignore_links: bool,
-            ignore_images: bool
+        self,
+        page_source: str,
+        content_length: int,
+        ignore_links: bool,
+        ignore_images: bool,
     ) -> dict:
         metadata = extract_metadata(page_source)
         markdown = generate_markdown(page_source, ignore_links, ignore_images)
@@ -79,6 +79,7 @@ class BaseSearchResult:
 
         return combined_data
 
+
 class SearchResult(BaseModel, BaseSearchResult):
     title: str
     link: HttpUrl
@@ -97,7 +98,9 @@ class SearchResult(BaseModel, BaseSearchResult):
             return self._basic_markdown()
 
         page_source = self._get_page_source(browser)
-        return self._extended_markdown(page_source, only_page_content, content_length, ignore_links, ignore_images)
+        return self._extended_markdown(
+            page_source, only_page_content, content_length, ignore_links, ignore_images
+        )
 
     def json(
         self,
@@ -112,7 +115,9 @@ class SearchResult(BaseModel, BaseSearchResult):
             return super().model_dump(**kwargs)
 
         page_source = self._get_page_source(browser)
-        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
+        return self._extended_json(
+            page_source, content_length, ignore_links, ignore_images
+        )
 
     def _get_page_source(self, browser: Browser) -> str:
         if browser:
@@ -139,34 +144,38 @@ class AsyncSearchResult(BaseModel):
     description: str | None = None
 
     async def markdown(
-            self,
-            extend: bool = True,
-            content_length: int = 1_000,
-            ignore_links: bool = False,
-            ignore_images: bool = True,
-            only_page_content: bool = False,
-            browser: AsyncBrowser | None = None,
+        self,
+        extend: bool = True,
+        content_length: int = 1_000,
+        ignore_links: bool = False,
+        ignore_images: bool = True,
+        only_page_content: bool = False,
+        browser: AsyncBrowser | None = None,
     ) -> str:
         if not extend:
             return self._basic_markdown()
 
         page_source = await self._get_page_source(browser)
-        return self._extended_markdown(page_source, only_page_content, content_length, ignore_links, ignore_images)
+        return self._extended_markdown(
+            page_source, only_page_content, content_length, ignore_links, ignore_images
+        )
 
     async def json(
-            self,
-            extend: bool = False,
-            content_length: int = 1_000,
-            browser: AsyncBrowser | None = None,
-            ignore_links: bool = False,
-            ignore_images: bool = True,
-            **kwargs: Any,
+        self,
+        extend: bool = False,
+        content_length: int = 1_000,
+        browser: AsyncBrowser | None = None,
+        ignore_links: bool = False,
+        ignore_images: bool = True,
+        **kwargs: Any,
     ) -> dict:
         if not extend:
             return super().model_dump(**kwargs)
 
         page_source = await self._get_page_source(browser)
-        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
+        return self._extended_json(
+            page_source, content_length, ignore_links, ignore_images
+        )
 
     async def _get_page_source(self, browser: AsyncBrowser | None = None) -> str:
         if browser:
@@ -196,25 +205,43 @@ class SearchResults:
         for result in self.results:
             yield result
 
-    def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
-        content = ['# Search Results:']
+    def markdown(
+        self, extend: bool = False, content_length: int = 400, **kwargs
+    ) -> str:
+        content = ["# Search Results:"]
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
 
             for result in self.results:
-                content.append(result.markdown(extend=extend, content_length=content_length, browser=browser, **kwargs))
+                content.append(
+                    result.markdown(
+                        extend=extend,
+                        content_length=content_length,
+                        browser=browser,
+                        **kwargs,
+                    )
+                )
 
-        return '\n\n'.join(content)
+        return "\n\n".join(content)
 
-    def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
+    def json(
+        self, extend: bool = False, content_length: int = 400, **kwargs
+    ) -> list[dict]:
         data = []
 
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
 
             for result in self.results:
-                data.append(result.json(extend=extend, content_length=content_length, browser=browser, **kwargs))
+                data.append(
+                    result.json(
+                        extend=extend,
+                        content_length=content_length,
+                        browser=browser,
+                        **kwargs,
+                    )
+                )
 
         return data
 
@@ -228,24 +255,42 @@ class AsyncSearchResults:
         for result in self.results:
             yield result
 
-    async def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
-        content = ['# Search Results:']
+    async def markdown(
+        self, extend: bool = False, content_length: int = 400, **kwargs
+    ) -> str:
+        content = ["# Search Results:"]
 
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
 
             for result in self.results:
-                content.append(await result.markdown(extend=extend, content_length=content_length, browser=browser, **kwargs))
+                content.append(
+                    await result.markdown(
+                        extend=extend,
+                        content_length=content_length,
+                        browser=browser,
+                        **kwargs,
+                    )
+                )
 
-        return '\n\n'.join(content)
+        return "\n\n".join(content)
 
-    async def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
+    async def json(
+        self, extend: bool = False, content_length: int = 400, **kwargs
+    ) -> list[dict]:
         data = []
 
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
 
             for result in self.results:
-                data.append(await result.json(extend=extend, content_length=content_length, browser=browser, **kwargs))
+                data.append(
+                    await result.json(
+                        extend=extend,
+                        content_length=content_length,
+                        browser=browser,
+                        **kwargs,
+                    )
+                )
 
         return data
