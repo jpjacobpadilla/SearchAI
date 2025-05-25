@@ -8,7 +8,7 @@ from playwright.sync_api import Browser, sync_playwright
 from playwright.async_api import async_playwright, Browser as AsyncBrowser
 
 
-playwright_config = {
+PLAYWRIGHT_CONFIG = {
     'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'viewport': {'width': 1280, 'height': 720},
     'locale': 'en-US'
@@ -19,6 +19,7 @@ class BaseSearchResult(BaseModel):
     title: str
     link: HttpUrl
     description: str | None = None
+    _proxy: Proxy | None = None
 
     def _basic_markdown(self) -> str:
         parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
@@ -134,8 +135,8 @@ class SearchResult(BaseSearchResult):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
             return self._use_playwright(browser)
 
@@ -192,8 +193,8 @@ class AsyncSearchResult(BaseSearchResult):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
             return await self._use_playwright(browser)
 
@@ -209,9 +210,9 @@ class AsyncSearchResult(BaseSearchResult):
 
 
 class SearchResults(list):
-    def __init__(self, results: list[SearchResult], proxy: Proxy | None):
+    def __init__(self, results: list[SearchResult], _proxy: Proxy | None):
         super().__init__(results)
-        self.proxy = proxy
+        self._proxy = _proxy
 
     def markdown(
         self, extend: bool = True, content_length: int = 400, **kwargs
@@ -221,8 +222,8 @@ class SearchResults(list):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
 
             for result in self:
@@ -245,8 +246,8 @@ class SearchResults(list):
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
 
             for result in self:
@@ -263,9 +264,9 @@ class SearchResults(list):
 
 
 class AsyncSearchResults(list):
-    def __init__(self, results: list[AsyncSearchResult], proxy: Proxy| None):
+    def __init__(self, results: list[AsyncSearchResult], _proxy: Proxy| None):
         super().__init__(results)
-        self.proxy = proxy
+        self._proxy = _proxy
 
     async def markdown(
         self, extend: bool = True, content_length: int = 400, **kwargs
@@ -275,8 +276,8 @@ class AsyncSearchResults(list):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
 
             for result in self:
@@ -299,8 +300,8 @@ class AsyncSearchResults(list):
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(
                 headless=True,
-                proxy=self.proxy.to_playwright_proxy(),
-                **playwright_config
+                proxy=self._proxy.to_playwright_proxy() if self._proxy else None,
+                **PLAYWRIGHT_CONFIG
             )
 
             for result in self:

@@ -34,7 +34,7 @@ def search(
     filters = filters.compile_filters() if filters else ''
     compiled_query = f'{query}{" " if filters else ""}{filters}'
 
-    results = SearchResults(results=[], proxy=proxy)
+    results = SearchResults(results=[], _proxy=proxy)
     result_set = set()
 
     while len(results) < length:
@@ -49,7 +49,7 @@ def search(
                 else:
                     result_set.add(new_result['link'])
 
-            results.append(SearchResult(**new_result))
+            results.append(SearchResult(**new_result, _proxy=proxy))
             if len(results) == length:
                 return results
 
