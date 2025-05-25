@@ -1,12 +1,6 @@
 from lxml import html
 from urllib.parse import urlparse, parse_qs
 
-from pydantic import BaseModel, HttpUrl
-
-class SearchResult(BaseModel):
-    title: str
-    link: HttpUrl
-    description: str | None
 
 RESULTS_XPATH = './/div[@class="ezO2md"][descendant::*[contains(@class, "fuLhoc")]]'
 TITLE_XPATH = './/*[contains(@class, "fuLhoc")]'
