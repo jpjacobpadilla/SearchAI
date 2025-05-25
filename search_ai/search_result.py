@@ -138,7 +138,7 @@ class SearchResult(BaseModel, BaseSearchResult):
         return page_source
 
 
-class AsyncSearchResult(BaseModel):
+class AsyncSearchResult(BaseModel, BaseSearchResult):
     title: str
     link: HttpUrl
     description: str | None = None
