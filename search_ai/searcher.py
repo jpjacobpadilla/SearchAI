@@ -10,6 +10,7 @@ from tenacity import (
 
 from .filters import Filters
 from .parse import parse_search
+from .search_result import SearchResult, SearchResults
 
 BASE_URL = 'https://www.google.com/search'
 
@@ -32,7 +33,7 @@ def search(
     filters = filters.compile_filters() if filters else ''
     compiled_query = f'{query}{" " if filters else ""}{filters}'
 
-    results = []
+    results = SearchResults(results=[], proxy=proxy)
     result_set = set()
 
     while len(results) < length:
@@ -42,12 +43,12 @@ def search(
 
         for new_result in new_results:
             if unique:
-                if new_result.link in result_set:
+                if new_result['link'] in result_set:
                     continue
                 else:
-                    result_set.add(new_result.link)
+                    result_set.add(new_result['link'])
 
-            results.append(new_result)
+            results.append(SearchResult(**new_result))
             if len(results) == length:
                 return results
 
