@@ -1,7 +1,7 @@
 from datetime import date
 from typing import Annotated
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, AfterValidator
 from pydantic.types import StringConstraints
 from publicsuffix2 import PublicSuffixList
 
@@ -33,9 +33,22 @@ def group_excludes(op: str, values: list[str]) -> list[str]:
     return [f"-{op}:{v}" for v in values]
 
 
+def validate_tld(v: str | list[str] | None):
+    # TODO: make type a generic type
+    if not v:
+        return v
+
+    tlds = v if isinstance(v, list) else [v]
+    for tld in tlds:
+        if not psl.get_tld(tld, strict=True):
+            raise ValueError(f'{tld!r} is an invalid top-level domain according to https://publicsuffix.org')
+
+    return v
+
+
 class Filters(BaseModel):
     sites: str | list[str] | None = Field(None, description="Only show results from specific domains")
-    tlds: str | list[str] | None = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
+    tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
     filetype: FileType | None = Field(None, description="Only show documents that are a specific file type. Note: Google only supports one filetype per search.")
     https_only: bool = Field(False, description="Only show websites that support HTTPS")
 
@@ -60,21 +73,6 @@ class Filters(BaseModel):
     not_in_title: str | list[str] | None = Field(None, description="Exclude pages with specific words in the title")
     not_in_url: str | list[str] | None = Field(None, description="Exclude pages with specific words in the URL")
     not_in_text: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
-
-    @field_validator('tlds', 'exclude_tlds', mode='before')
-    @classmethod
-    def validate_tld(cls, v: str | list[str] | None):
-        if not v:
-            return v
-
-        valid_tlds = [
-            psl.get_tld(tld, strict=True)
-            for tld in (v if isinstance(v, list) else [v])
-        ]
-
-        if all(valid_tlds):
-            return v
-        raise ValueError(f'{v} is an invalid top level domain according to https://publicsuffix.org')
 
     def compile_filters(self) -> str:
         filters = []
