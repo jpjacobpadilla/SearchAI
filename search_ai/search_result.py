@@ -1,77 +1,28 @@
-from typing import Generator, Any
+from typing import Generator, Any, AsyncGenerator
 
-import html2text
-from lxml import html
+from .utils import extract_metadata, generate_markdown
+
 from pydantic import BaseModel, HttpUrl
 from playwright.sync_api import Browser, sync_playwright
+from playwright.async_api import async_playwright
 
 
-def extract_metadata(page_source: str) -> dict:
-    tree = html.fromstring(page_source)
+class BaseSearchResult:
+    def _basic_markdown(self) -> str:
+        parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
+        if self.description:
+            parts.append(f"**Description:** {self.description}")
+        return "\n".join(parts)
 
-    page_title = tree.xpath("//head/title/text()")
-    page_description = tree.xpath('//head/meta[@name="description"]/@content')
-    author = tree.xpath('//head/meta[@name="author"]/@content')
-    twitter_handle = tree.xpath('//head/meta[@name="twitter:site"]/@content')
-
-    result = {}
-
-    if page_title:
-        result["title"] = page_title[0]
-    if page_description:
-        result["description"] = page_description[0]
-    if author:
-        result["author"] = author[0]
-    if twitter_handle:
-        result["twitter"] = twitter_handle[0]
-
-    return result
-
-
-class SearchResult(BaseModel):
-    title: str
-    link: HttpUrl
-    description: str | None = None
-
-    def _get_page_source(self, browser: Browser) -> str:
-        page_source = ""
-
-        if browser:
-            page_source = self._use_playwright(browser)
-        else:
-            with sync_playwright() as playwright:
-                browser = playwright.chromium.launch(headless=True)
-                page_source = self._use_playwright(browser)
-
-        return page_source
-
-    @staticmethod
-    def _generate_markdown(
-        page_source: str, ignore_links: bool, ignore_images: bool
+    def _extended_markdown(
+            self,
+            page_source: str,
+            only_page_content: bool,
+            content_length: int,
+            ignore_links: bool,
+            ignore_images: bool
     ) -> str:
-        text_maker = html2text.HTML2Text()
-        text_maker.ignore_links = ignore_links
-        text_maker.ignore_images = ignore_images
-        text_maker.body_width = 0  # Prevent automatic wrapping
-        return text_maker.handle(page_source)
-
-    def markdown(
-        self,
-        extend: bool = True,
-        content_length: int = 1_000,
-        ignore_links: bool = False,
-        ignore_images: bool = True,
-        only_page_content: bool = False,
-        browser: Browser | None = None,
-    ) -> str:
-        if not extend:
-            parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
-            if self.description:
-                parts.append(f"**Description:** {self.description}")
-            return "\n".join(parts)
-
-        page_source = self._get_page_source(browser)
-        markdown = self._generate_markdown(page_source, ignore_links, ignore_images)
+        markdown = generate_markdown(page_source, ignore_links, ignore_images)
 
         if only_page_content:
             return markdown[:content_length]
@@ -99,28 +50,15 @@ class SearchResult(BaseModel):
 
         return "\n".join(parts)
 
-    def _use_playwright(self, browser: Browser) -> str:
-        page = browser.new_page()
-        page.goto(str(self.link), wait_until="load")
-        page_source = page.content()
-        page.close()
-        return page_source
-
-    def json(
-        self,
-        extend: bool = False,
-        content_length: int = 400,
-        browser: Browser | None = None,
-        ignore_links: bool = False,
-        ignore_images: bool = True,
-        **kwargs: Any,
+    def _extended_json(
+            self,
+            page_source: str,
+            content_length: int,
+            ignore_links: bool,
+            ignore_images: bool
     ) -> dict:
-        if not extend:
-            return super().model_dump(**kwargs)
-
-        page_source = self._get_page_source(browser)
         metadata = extract_metadata(page_source)
-        markdown = self._generate_markdown(page_source, ignore_links, ignore_images)
+        markdown = generate_markdown(page_source, ignore_links, ignore_images)
 
         combined_data = {
             "title": metadata["title"] or self.title,
@@ -141,6 +79,107 @@ class SearchResult(BaseModel):
 
         return combined_data
 
+class SearchResult(BaseModel, BaseSearchResult):
+    title: str
+    link: HttpUrl
+    description: str | None = None
+
+    def markdown(
+        self,
+        extend: bool = True,
+        content_length: int = 1_000,
+        ignore_links: bool = False,
+        ignore_images: bool = True,
+        only_page_content: bool = False,
+        browser: Browser | None = None,
+    ) -> str:
+        if not extend:
+            return self._basic_markdown()
+
+        page_source = self._get_page_source(browser)
+        return self._extended_markdown(page_source, only_page_content, content_length, ignore_links, ignore_images)
+
+    def json(
+        self,
+        extend: bool = False,
+        content_length: int = 1_000,
+        browser: Browser | None = None,
+        ignore_links: bool = False,
+        ignore_images: bool = True,
+        **kwargs: Any,
+    ) -> dict:
+        if not extend:
+            return super().model_dump(**kwargs)
+
+        page_source = self._get_page_source(browser)
+        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
+
+    def _get_page_source(self, browser: Browser) -> str:
+        if browser:
+            return self._use_playwright(browser)
+
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+            return self._use_playwright(browser)
+
+    def _use_playwright(self, browser: Browser) -> str:
+        page = browser.new_page()
+        page.goto(str(self.link), wait_until="load")
+        page_source = page.content()
+        page.close()
+        return page_source
+
+
+class AsyncSearchResult(BaseModel):
+    title: str
+    link: HttpUrl
+    description: str | None = None
+
+    async def markdown(
+            self,
+            extend: bool = True,
+            content_length: int = 1_000,
+            ignore_links: bool = False,
+            ignore_images: bool = True,
+            only_page_content: bool = False,
+            browser: Browser | None = None,
+    ) -> str:
+        if not extend:
+            return self._basic_markdown()
+
+        page_source = await self._get_page_source(browser)
+        return self._extended_markdown(page_source, only_page_content, content_length, ignore_links, ignore_images)
+
+    async def json(
+            self,
+            extend: bool = False,
+            content_length: int = 1_000,
+            browser: Browser | None = None,
+            ignore_links: bool = False,
+            ignore_images: bool = True,
+            **kwargs: Any,
+    ) -> dict:
+        if not extend:
+            return super().model_dump(**kwargs)
+
+        page_source = await self._get_page_source(browser)
+        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
+
+    async def _get_page_source(self, browser: Browser | None = None) -> str:
+        if browser:
+            return await self._use_playwright(browser)
+
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+            return await self._use_playwright(browser)
+
+    async def _use_playwright(self, browser: Browser) -> str:
+        page = await browser.new_page()
+        await page.goto(str(self.link), wait_until="load")
+        page_source = await page.content()
+        page.close()
+        return page_source
+
 
 class SearchResults:
     def __init__(self, results: list[SearchResult], proxy: str = ""):
@@ -151,33 +190,56 @@ class SearchResults:
         for result in self.results:
             yield result
 
-    def markdown(self, extend: bool = False, content_length: int = 400) -> str:
-        content = "# Search Results:\n\n"
-        browser = None
+    def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
+        content = ['# Search Results:']
 
-        for result in self.results:
-            content += (
-                result.markdown(
-                    extend=extend,
-                    content_length=content_length,
-                    browser_context=browser,
-                )
-                + "\n\n"
-            )
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
 
-        return content
+            for result in self.results:
+                content.append(result.markdown(extend=extend, content_length=content_length, browser=browser, **kwargs))
 
-    def json(self, extend: bool = False, content_length: int = 400) -> list[dict]:
+        return '\n\n'.join(content)
+
+    def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
         data = []
-        browser = None
 
+        with sync_playwright() as playwright:
+            browser = playwright.chromium.launch(headless=True)
+
+            for result in self.results:
+                data.append(result.json(extend=extend, content_length=content_length, browser=browser, **kwargs))
+
+        return data
+
+
+class AsyncSearchResults:
+    def __init__(self, results: list[AsyncSearchResult], proxy: str = ""):
+        self.results = results
+        self.proxy = proxy
+
+    async def __aiter__(self) -> AsyncGenerator[AsyncSearchResult, None]:
         for result in self.results:
-            data.append(
-                result.json(
-                    extend=extend,
-                    content_length=content_length,
-                    browser_context=browser,
-                )
-            )
+            yield result
+
+    async def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
+        content = ['# Search Results:']
+
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+
+            for result in self.results:
+                content.append(await result.markdown(extend=extend, content_length=content_length, browser=browser, **kwargs))
+
+        return '\n\n'.join(content)
+
+    async def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
+        data = []
+
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(headless=True)
+
+            for result in self.results:
+                data.append(await result.json(extend=extend, content_length=content_length, browser=browser, **kwargs))
 
         return data

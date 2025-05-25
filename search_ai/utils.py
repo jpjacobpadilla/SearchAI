@@ -1,47 +1,34 @@
+import html2text
 from lxml import html
-from urllib.parse import urlparse, parse_qs
 
 
-RESULTS_XPATH = './/div[@class="ezO2md"][descendant::*[contains(@class, "fuLhoc")]]'
-TITLE_XPATH = './/*[contains(@class, "fuLhoc")]'
-SUB_TITLE_XPATH = './span[1]'
-LINK_XPATH = './/a'
-DESCRIPTION_XPATH = './/span[contains(@class, "FrIlee")]//span[@class="fYyStc" and normalize-space()]'
+def extract_metadata(page_source: str) -> dict:
+    tree = html.fromstring(page_source)
 
-def parse_search(data):
-    result_set = []
+    page_title = tree.xpath("//head/title/text()")
+    page_description = tree.xpath('//head/meta[@name="description"]/@content')
+    author = tree.xpath('//head/meta[@name="author"]/@content')
+    twitter_handle = tree.xpath('//head/meta[@name="twitter:site"]/@content')
 
-    tree = html.fromstring(data)
-    results = tree.xpath(RESULTS_XPATH)
+    result = {}
 
-    for result in results:
-        title_elem = result.xpath(TITLE_XPATH)
-        if not title_elem:
-            continue
+    if page_title:
+        result["title"] = page_title[0]
+    if page_description:
+        result["description"] = page_description[0]
+    if author:
+        result["author"] = author[0]
+    if twitter_handle:
+        result["twitter"] = twitter_handle[0]
 
-        title_elem = title_elem[0]
-        if title := title_elem.xpath(SUB_TITLE_XPATH):
-            extracted_title = title[0].text
-        else:
-            extracted_title = title_elem.text
+    return result
 
-        link_elem = result.xpath(LINK_XPATH)[0].attrib['href']
-        link = parse_qs(urlparse(link_elem).query).get('q')
-        if not link:
-            continue
+def generate_markdown(
+        page_source: str, ignore_links: bool, ignore_images: bool
+) -> str:
+    text_maker = html2text.HTML2Text()
+    text_maker.ignore_links = ignore_links
+    text_maker.ignore_images = ignore_images
+    text_maker.body_width = 0  # Prevent automatic wrapping
+    return text_maker.handle(page_source)
 
-        extracted_link = link[0].strip()
-
-        description_elem = result.xpath(DESCRIPTION_XPATH)
-        if description_elem:
-            extracted_description = description_elem[0].text_content().strip()
-        else:
-            extracted_description = None
-
-        result_set.append(SearchResult(
-            title=extracted_title,
-            link=extracted_link,
-            description=extracted_description
-        ))
-
-    return result_set
