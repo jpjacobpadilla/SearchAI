@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "html2text>=2025.4.15",
-    "httpx>=0.28.1",
+    "httpx[socks]>=0.28.1",
     "lxml>=5.4.0",
     "playwright>=1.52.0",
     "publicsuffix2>=2.20191221",
