@@ -192,14 +192,10 @@ class AsyncSearchResult(BaseSearchResult):
         return page_source
 
 
-class SearchResults:
+class SearchResults(list):
     def __init__(self, results: list[SearchResult], proxy: str = ""):
-        self.results = results
+        super().__init__(results)
         self.proxy = proxy
-
-    def __iter__(self) -> Generator[SearchResult, None, None]:
-        for result in self.results:
-            yield result
 
     def markdown(
         self, extend: bool = False, content_length: int = 400, **kwargs
@@ -209,7 +205,7 @@ class SearchResults:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
 
-            for result in self.results:
+            for result in self:
                 content.append(
                     result.markdown(
                         extend=extend,
@@ -229,7 +225,7 @@ class SearchResults:
         with sync_playwright() as playwright:
             browser = playwright.chromium.launch(headless=True)
 
-            for result in self.results:
+            for result in self:
                 data.append(
                     result.json(
                         extend=extend,
@@ -242,14 +238,10 @@ class SearchResults:
         return data
 
 
-class AsyncSearchResults:
+class AsyncSearchResults(list):
     def __init__(self, results: list[AsyncSearchResult], proxy: str = ""):
-        self.results = results
+        super().__init__(results)
         self.proxy = proxy
-
-    async def __aiter__(self) -> AsyncGenerator[AsyncSearchResult, None]:
-        for result in self.results:
-            yield result
 
     async def markdown(
         self, extend: bool = False, content_length: int = 400, **kwargs
@@ -259,7 +251,7 @@ class AsyncSearchResults:
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
 
-            for result in self.results:
+            for result in self:
                 content.append(
                     await result.markdown(
                         extend=extend,
@@ -279,7 +271,7 @@ class AsyncSearchResults:
         async with async_playwright() as playwright:
             browser = await playwright.chromium.launch(headless=True)
 
-            for result in self.results:
+            for result in self:
                 data.append(
                     await result.json(
                         extend=extend,
