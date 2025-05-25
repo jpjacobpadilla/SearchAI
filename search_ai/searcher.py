@@ -102,7 +102,17 @@ def _request(
         return resp.text
 
 
-def generate_useragent():
+def generate_useragent() -> str:
+    """
+    Returns a Lynx browser User Agent string.
+
+    The idea to use the Lynx browser User Agent was from
+    the following GitHub project: https://github.com/Nv7-GitHub/googlesearch
+
+    Returns:
+        str: A User Agent string for the Lynx browser.
+    """
+
     # Lynx: 2.8.5–2.9.2 or 3.0.0–3.2.0
     major = random.choice([2, 3])
     if major == 2:
