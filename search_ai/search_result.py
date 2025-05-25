@@ -52,18 +52,18 @@ class BaseSearchResult(BaseModel):
         metadata = extract_metadata(page_source)
 
         parts = [
-            f"**Title:** {metadata['title'] or self.title}",
+            f"**Title:** {metadata.get('title') or self.title}",
             f"**Link:** {self.link}",
         ]
 
-        if metadata["description"]:
+        if metadata.get('description'):
             parts.append(f"**Description:** {metadata['description']}")
         elif self.description:
             parts.append(f"**Description:** {self.description}")
 
-        if metadata["author"]:
+        if metadata.get('author'):
             parts.append(f"**Author:** {metadata['author']}")
-        if metadata["twitter"]:
+        if metadata.get('twitter'):
             parts.append(f"**Twitter:** {metadata['twitter']}")
 
         parts.append("")  # Extra break between metadata and page data
@@ -83,18 +83,18 @@ class BaseSearchResult(BaseModel):
         markdown = generate_markdown(page_source, ignore_links, ignore_images)
 
         combined_data = {
-            "title": metadata["title"] or self.title,
+            "title": metadata.get('title') or self.title,
             "link": str(self.link),
         }
 
-        if metadata["description"]:
+        if metadata.get('description'):
             combined_data["description"] = metadata["description"]
         elif self.description:
             combined_data["description"] = self.description
 
-        if metadata["author"]:
+        if metadata.get('author'):
             combined_data["author"] = metadata["author"]
-        if metadata["twitter"]:
+        if metadata.get('twitter'):
             combined_data["twitter"] = metadata["twitter"]
 
         combined_data["page_preview"] = markdown[:content_length]
