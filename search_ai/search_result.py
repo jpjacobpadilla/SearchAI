@@ -242,7 +242,7 @@ class SearchResults(list):
                     )
                 )
 
-        return "# Search Results\n\n" + "\n\n----------\n\n".join(content)
+        return "# Search Results\n\n" + "\n----------\n".join(content)
 
     def json(
         self, extend: bool = True, content_length: int = 400, **kwargs
