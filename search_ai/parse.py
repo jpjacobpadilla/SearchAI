@@ -38,10 +38,10 @@ def parse_search(data):
         else:
             extracted_description = None
 
-        result_set.append(SearchResult(
-            title=extracted_title,
-            link=extracted_link,
-            description=extracted_description
-        ))
+        result_set.append({
+            'title': extracted_title,
+            'link': extracted_link,
+            'description': extracted_description
+        })
 
     return result_set
