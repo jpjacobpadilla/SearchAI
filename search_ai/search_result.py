@@ -104,7 +104,7 @@ class SearchResult(BaseSearchResult):
 
     def json(
         self,
-        extend: bool = False,
+        extend: bool = True,
         content_length: int = 1_000,
         browser: Browser | None = None,
         ignore_links: bool = False,
@@ -158,7 +158,7 @@ class AsyncSearchResult(BaseSearchResult):
 
     async def json(
         self,
-        extend: bool = False,
+        extend: bool = True,
         content_length: int = 1_000,
         browser: AsyncBrowser | None = None,
         ignore_links: bool = False,
@@ -198,7 +198,7 @@ class SearchResults(list):
         self.proxy = proxy
 
     def markdown(
-        self, extend: bool = False, content_length: int = 400, **kwargs
+        self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> str:
         content = ["# Search Results:"]
 
@@ -218,7 +218,7 @@ class SearchResults(list):
         return "\n\n".join(content)
 
     def json(
-        self, extend: bool = False, content_length: int = 400, **kwargs
+        self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> list[dict]:
         data = []
 
@@ -244,7 +244,7 @@ class AsyncSearchResults(list):
         self.proxy = proxy
 
     async def markdown(
-        self, extend: bool = False, content_length: int = 400, **kwargs
+        self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> str:
         content = ["# Search Results:"]
 
@@ -264,7 +264,7 @@ class AsyncSearchResults(list):
         return "\n\n".join(content)
 
     async def json(
-        self, extend: bool = False, content_length: int = 400, **kwargs
+        self, extend: bool = True, content_length: int = 400, **kwargs
     ) -> list[dict]:
         data = []
 
