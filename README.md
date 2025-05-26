@@ -1,4 +1,4 @@
-<h1 align="center">🔍 SearchAI</h1>
+<h3 align="center">SearchAI</h3>
 
 <p align="center">
 Google Search & News tool with advanced filters and LLM-friendly output formats!
