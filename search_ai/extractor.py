@@ -55,15 +55,10 @@ async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]
 
             return results[0] if isinstance(url, str) else results
 
-    except PlaywrightError as e:
-        if "Executable doesn't exist" in str(e) or 'Please run the following command to download new browsers' in str(
-            e
-        ):
-            print("Playwright browser not found. Running 'playwright install'...")
-            subprocess.run(['playwright', 'install', 'chromium'], check=True)
-            return await get_page(url, proxy)
-        else:
-            raise  # Unexpected error, re-raise
+    except PlaywrightError:
+        print("Playwright browser not found. Running 'playwright install'...")
+        subprocess.run(['playwright', 'install', 'chromium'], check=True)
+        return await get_page(url, proxy)
 
 
 async def _get_page_source(url: str, semaphore: asyncio.Semaphore, browser: AsyncBrowser) -> str:
