@@ -8,6 +8,7 @@ SUB_TITLE_XPATH = './span[1]'
 LINK_XPATH = './/a'
 DESCRIPTION_XPATH = './/span[contains(@class, "FrIlee")]//span[@class="fYyStc" and normalize-space()]'
 
+
 def parse_search(data):
     result_set = []
 
