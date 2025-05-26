@@ -99,7 +99,7 @@ class BaseSearchResult(BaseModel):
 class SearchResult(BaseSearchResult):
     def markdown(
         self,
-        extend: bool = True,
+        extend: bool = False,
         content_length: int = 1_000,
         ignore_links: bool = False,
         ignore_images: bool = True,
@@ -115,7 +115,7 @@ class SearchResult(BaseSearchResult):
 
     def json(
         self,
-        extend: bool = True,
+        extend: bool = False,
         content_length: int = 1_000,
         ignore_links: bool = False,
         ignore_images: bool = True,
@@ -133,7 +133,7 @@ class SearchResult(BaseSearchResult):
 class AsyncSearchResult(BaseSearchResult):
     async def markdown(
         self,
-        extend: bool = True,
+        extend: bool = False,
         content_length: int = 1_000,
         ignore_links: bool = False,
         ignore_images: bool = True,
@@ -149,7 +149,7 @@ class AsyncSearchResult(BaseSearchResult):
 
     async def json(
         self,
-        extend: bool = True,
+        extend: bool = False,
         content_length: int = 1_000,
         ignore_links: bool = False,
         ignore_images: bool = True,
@@ -169,7 +169,7 @@ class SearchResults(list):
         super().__init__(results)
         self._proxy = _proxy
 
-    def markdown(self, extend: bool = True, content_length: int = 400, **kwargs) -> str:
+    def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
         if not self:  # Edge case for no search results
             return ''
 
@@ -190,7 +190,7 @@ class SearchResults(list):
         return "# Search Results\n\n" + "\n----------\n".join(content)
 
     def json(
-        self, extend: bool = True, content_length: int = 400, **kwargs
+        self, extend: bool = False, content_length: int = 400, **kwargs
     ) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
@@ -210,7 +210,7 @@ class AsyncSearchResults(list):
         self._proxy = _proxy
 
     async def markdown(
-        self, extend: bool = True, content_length: int = 400, **kwargs
+        self, extend: bool = False, content_length: int = 400, **kwargs
     ) -> str:
         if not extend:
             content = [result._basic_markdown() for result in self]
@@ -229,7 +229,7 @@ class AsyncSearchResults(list):
         return "# Search Results\n\n" + "\n----------\n".join(content)
 
     async def json(
-        self, extend: bool = True, content_length: int = 400, **kwargs
+        self, extend: bool = False, content_length: int = 400, **kwargs
     ) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
