@@ -24,7 +24,6 @@ def search(
         offset: int = 0,
         unique: bool = False,
         safe: bool = True,
-        lang: str = 'en',
         region: str | None = None,
         proxy: Proxy | None = None,
         sleep_time: int = 0.5
@@ -39,7 +38,7 @@ def search(
 
     while len(results) < count:
         adjusted_count = (count - len(results)) + 2  # Plus 2 because not all the results are links
-        response = _request(compiled_query, mode, adjusted_count, lang, offset, safe, region, proxy)
+        response = _request(compiled_query, mode, adjusted_count, offset, safe, region, proxy)
 
         new_results = parse_search(response)
 
@@ -83,7 +82,7 @@ def _request(
         'q': query,
         'num': number,
         'start': offset,
-        'safe': safe
+        'safe': 'active' if safe else 'off'
     }
 
     if region:
