@@ -38,7 +38,8 @@ def search(
     result_set = set()
 
     while len(results) < count:
-        response = _request(compiled_query, mode, count + 1, lang, offset, safe, region, proxy)
+        adjusted_count = (count - len(results)) + 2  # Plus 2 because not all the results are links
+        response = _request(compiled_query, mode, adjusted_count, lang, offset, safe, region, proxy)
 
         new_results = parse_search(response)
 
@@ -73,7 +74,6 @@ def _request(
         query: str,
         mode: Literal['news'] | Literal['search'],
         number: int,
-        lang: str,
         offset: int,
         safe: bool,
         region: str | None,
@@ -83,8 +83,7 @@ def _request(
         'q': query,
         'num': number,
         'start': offset,
-        'safe': safe,
-        'hl': lang
+        'safe': safe
     }
 
     if region:
