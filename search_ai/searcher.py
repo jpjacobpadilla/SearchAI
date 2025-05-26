@@ -20,14 +20,14 @@ def search(
         query: str = '',
         filters: Filters | None = None,
         mode: Literal['news'] | Literal['search'] = 'search',
-        count: int = 5,
+        count: int = 10,
         offset: int = 0,
         unique: bool = False,
         safe: bool = True,
         lang: str = 'en',
         region: str | None = None,
         proxy: Proxy | None = None,
-        sleep_time: int = 1
+        sleep_time: int = 0.5
 ):
     assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
 
@@ -56,7 +56,9 @@ def search(
             if len(results) == count:
                 return results
 
-        twenty_percent = sleep_time * .20
+        offset += len(new_results)
+
+        twenty_percent = sleep_time * .10
         time.sleep(random.uniform(sleep_time - twenty_percent, sleep_time + twenty_percent))
 
     return results
@@ -82,10 +84,11 @@ def _request(
         'num': number,
         'start': offset,
         'safe': safe,
-        'hl': lang,
-        'gl': region
+        'hl': lang
     }
 
+    if region:
+        params['gl'] = region
     if mode == 'news':
         params['tbm'] = 'nws'
 
@@ -101,7 +104,8 @@ def _request(
         'User-Agent': generate_useragent()
     }
 
-    with httpx.Client(proxy=proxy.to_httpx_proxy_url(), headers=headers, cookies=cookies) as client:
+    httpx_proxy = proxy.to_httpx_proxy_url() if proxy else None
+    with httpx.Client(proxy=httpx_proxy, headers=headers, cookies=cookies) as client:
         resp = client.get(BASE_URL, params=params)
         resp.raise_for_status()
         return resp.text
