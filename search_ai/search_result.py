@@ -170,6 +170,9 @@ class SearchResults(list):
         self._proxy = _proxy
 
     def markdown(self, extend: bool = True, content_length: int = 400, **kwargs) -> str:
+        if not self:  # Edge case for no search results
+            return ''
+
         if not extend:
             content = [result._basic_markdown() for result in self]
 

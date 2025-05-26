@@ -42,6 +42,9 @@ def search(
 
         new_results = parse_search(response)
 
+        if not new_results:
+            return results
+
         for new_result in new_results:
             if unique:
                 if new_result['link'] in result_set:
