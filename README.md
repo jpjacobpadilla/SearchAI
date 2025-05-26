@@ -26,6 +26,8 @@ $ pip install search-ai-core
 
 ### Regional targeting
 
+### Search news
+
 ### Markdown format
 
 ### JSON format
