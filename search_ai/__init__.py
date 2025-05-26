@@ -1,5 +1,4 @@
-from .searcher import search
-from .async_searcher import async_search
+from .searcher import search, async_search
 
 from .filters import Filters
 

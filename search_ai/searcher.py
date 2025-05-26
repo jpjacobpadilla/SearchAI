@@ -1,5 +1,6 @@
 import time
 import random
+import asyncio
 from typing import Literal
 
 import httpx
@@ -8,7 +9,8 @@ from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_t
 from .proxy import Proxy
 from .filters import Filters
 from .parse import parse_search
-from .search_result import SearchResult, SearchResults
+from .utils import generate_useragent
+from .search_result import SearchResult, SearchResults, AsyncSearchResult, AsyncSearchResults
 
 BASE_URL = 'https://www.google.com/search'
 
@@ -104,40 +106,92 @@ def _request(
         return resp.text
 
 
-def generate_useragent() -> str:
-    """
-    Returns a Lynx browser User Agent string.
+async def async_search(
+        query: str = '',
+        filters: Filters | None = None,
+        mode: Literal['news'] | Literal['search'] = 'search',
+        count: int = 10,
+        offset: int = 0,
+        unique: bool = False,
+        safe: bool = True,
+        region: str | None = None,
+        proxy: Proxy | None = None,
+        sleep_time: int = 0.5,
+):
+    assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
 
-    The idea to use the Lynx browser User Agent was from
-    the following GitHub project: https://github.com/Nv7-GitHub/googlesearch
+    filters = filters.compile_filters() if filters else ''
+    compiled_query = f'{query}{" " if filters else ""}{filters}'
 
-    Returns:
-        str: A User Agent string for the Lynx browser.
-    """
+    results = AsyncSearchResults(results=[], _proxy=proxy)
+    result_set = set()
 
-    # Lynx: 2.8.5–2.9.2 or 3.0.0–3.2.0
-    major = random.choice([2, 3])
-    if major == 2:
-        minor = random.randint(8, 9)
-        patch = random.randint(0, 2)
-    else:
-        minor = random.randint(0, 2)
-        patch = 0
-    lynx_version = f'Lynx/{major}.{minor}.{patch}'
+    while len(results) < count:
+        adjusted_count = (count - len(results)) + 2  # Plus 2 because not all the results are links
+        response = await _async_request(compiled_query, mode, adjusted_count, offset, safe, region, proxy)
 
-    # libwww-FM: realistically 2.14 ± small variance
-    libwww_version = f'libwww-FM/{random.choice([13, 14, 15])}'
+        new_results = parse_search(response)
 
-    # SSL-MM: pin around 1.4.x
-    ssl_mm_version = f'SSL-MM/1.{random.randint(4, 5)}.{random.randint(0, 9)}'
+        if not new_results:
+            return results
 
-    # OpenSSL: legacy 1.1.x or modern 3.x (3.4–3.5)
-    openssl_major = random.choice([1, 3])
-    if openssl_major == 1:
-        openssl_minor = random.randint(0, 1)
-    else:
-        openssl_minor = random.randint(4, 5)
-    openssl_patch = random.randint(0, 9)
-    openssl_version = f'OpenSSL/{openssl_major}.{openssl_minor}.{openssl_patch}'
+        for new_result in new_results:
+            if unique:
+                if new_result['link'] in result_set:
+                    continue
+                else:
+                    result_set.add(new_result['link'])
 
-    return f'{lynx_version} {libwww_version} {ssl_mm_version} {openssl_version}'
+            results.append(AsyncSearchResult(**new_result, _proxy=proxy))
+            if len(results) == count:
+                return results
+
+        offset += len(new_results)
+
+        twenty_percent = sleep_time * 0.10
+        await asyncio.sleep(random.uniform(sleep_time - twenty_percent, sleep_time + twenty_percent))
+
+    return results
+
+
+@retry(
+    stop=stop_after_attempt(2),
+    wait=wait_fixed(2),
+    retry=retry_if_exception_type(httpx.HTTPError),
+    reraise=True,
+)
+async def _async_request(
+        query: str,
+        mode: Literal['news'] | Literal['search'],
+        number: int,
+        offset: int,
+        safe: bool,
+        region: str | None,
+        proxy: Proxy | None,
+) -> str:
+    params = {
+        'q': query,
+        'num': number,
+        'start': offset,
+        'safe': 'active' if safe else 'off',
+    }
+
+    if region:
+        params['gl'] = region
+    if mode == 'news':
+        params['tbm'] = 'nws'
+
+    cookies = {'CONSENT': 'PENDING+987', 'SOCS': 'CAESHAgBEhIaAB'}
+
+    headers = {
+        'Accept': 'text/html, text/plain, text/sgml, text/css, */*;q=0.01',
+        'Accept-Encoding': 'gzip, compress, bzip2',
+        'Accept-Language': 'en',
+        'User-Agent': generate_useragent(),
+    }
+
+    httpx_proxy = proxy.to_httpx_proxy_url() if proxy else None
+    async with httpx.AsyncClient(proxy=httpx_proxy, headers=headers, cookies=cookies) as client:
+        resp = await client.get(BASE_URL, params=params)
+        resp.raise_for_status()
+        return resp.text
