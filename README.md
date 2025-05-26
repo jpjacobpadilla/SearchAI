@@ -18,7 +18,7 @@ Google Search & News tool with advanced filters and LLM-friendly output formats!
 $ pip install search-ai-core
 ```
 
-## Examples
+## 🚀 Examples
 
 ### Basic search
 
@@ -36,7 +36,7 @@ $ pip install search-ai-core
 
 ### Async support
 
-## All filters
+## 🧰 All filters
 
-## Search Configuration Options
+## ⚙️ Search Configuration Options
 
