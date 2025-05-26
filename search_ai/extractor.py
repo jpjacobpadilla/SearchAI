@@ -20,7 +20,7 @@ def get_page_sync(url: str, proxy: Proxy | None) -> str: ...
 def get_page_sync(url: list[str], proxy: Proxy | None) -> list[str]: ...
 
 
-def get_page_sync(url: str | list[str], proxy: Proxy | None) -> list[str]:
+def get_page_sync(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
     try:
         loop = asyncio.get_running_loop()
         return asyncio.run_coroutine_threadsafe(get_page(url, proxy), loop).result()
@@ -34,7 +34,7 @@ async def get_page(url: str, proxy: Proxy | None) -> str: ...
 async def get_page(url: list[str], proxy: Proxy | None) -> list[str]: ...
 
 
-async def get_page(url: str | list[str], proxy: Proxy | None) -> list[str]:
+async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
     semaphore = asyncio.Semaphore(8)
     url_list = url if isinstance(url, list) else [url]
 
