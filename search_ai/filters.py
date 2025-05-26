@@ -62,10 +62,11 @@ class Filters(BaseModel):
     before: date | None = Field(None, description='Only show results before this date')
     after: date | None = Field(None, description='Only show results after this date')
 
-    keywords: Keyword | list[Keyword] | None = Field(None, description='Require specific words anywhere in the page')
+    any_keywords: Keyword | list[Keyword] | None = Field(None, description='Require at least one word anywhere in the page')
+    all_keywords: Keyword | list[Keyword] | None = Field(None, description='Require specific words anywhere in the page')
     exact_phrases: str | list[str] | None = Field(None, description='Include results with exact phrases')
 
-    exclude_keywords: Keyword | list[Keyword] | None = Field(None, description='Exclude pages containing certain words')
+    exclude_all_keywords: Keyword | list[Keyword] | None = Field(None, description='Exclude pages containing certain words')
     exclude_exact_phrases: str | list[str] | None = Field(None, description='Exclude results with exact phrases')
 
     in_title: str | list[str] | None = Field(None, description='Require specific words in the title')
@@ -84,7 +85,8 @@ class Filters(BaseModel):
         filters.append(group_includes(to_list(self.tlds), 'site'))
 
         filters.append(group_includes(to_list(self.filetype), 'filetype'))
-        filters.append(group_includes(to_list(self.keywords)))
+        filters.append(group_includes(to_list(self.any_keywords)))
+        filters.extend([f'"{w}"' for w in to_list(self.all_keywords)])
 
         if self.exact_phrases:
             phrase_list = self.exact_phrases if isinstance(self.exact_phrases, list) else [self.exact_phrases]
@@ -118,7 +120,7 @@ class Filters(BaseModel):
             filters.append('-inurl:https')
 
         filters.extend(group_excludes('filetype', to_list(self.exclude_filetypes)))
-        filters.extend([f'-{w}' for w in to_list(self.exclude_keywords)])
+        filters.extend([f'-{w}' for w in to_list(self.exclude_all_keywords)])
 
         filters.extend([f'-inurl:{w}' for w in to_list(self.not_in_url)])
         filters.extend([f'-intitle:{w}' for w in to_list(self.not_in_title)])
