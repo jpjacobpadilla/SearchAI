@@ -26,8 +26,11 @@ def group_includes(values: list[str], op: str | None = None) -> str:
         return f'{op}:{values[0]}' if op else f'"{values[0]}"'
 
     if op:
-        return f'({" | ".join(f"{op}:{v}" for v in values)})'
-    return f'({" | ".join(f'"{v}"' for v in values)})'
+        parts = [f'{op}:{v}' for v in values]
+    else:
+        parts = [f'"{v}"' for v in values]
+
+    return f'({" | ".join(parts)})'
 
 
 def group_excludes(op: str, values: list[str]) -> list[str]:
