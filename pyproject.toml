@@ -8,6 +8,16 @@ version = "0.1.0"
 description = "Google Search & News tool with advanced filters and LLM-friendly output formats!"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { text = "MIT" }
+homepage = "https://github.com/jpjacobpadilla/SearchAI"
+authors = [
+    { name = "Jacob Padilla", email = "searchai@jacobpadilla.com" }
+]
+keywords = [
+    "python", "search", "markdown", "search-engine",
+    "data", "google", "ai", "web-crawler", "googlesearch",
+    "googlenews", "llm"
+]
 dependencies = [
     "html2text>=2025.4.15",
     "httpx[socks]>=0.28.1",
