@@ -2,6 +2,7 @@ import time
 import random
 import asyncio
 from typing import Literal
+from functools import partial
 
 import httpx
 from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
@@ -13,6 +14,14 @@ from .utils import generate_useragent
 from .search_result import SearchResult, SearchResults, AsyncSearchResult, AsyncSearchResults
 
 BASE_URL = 'https://www.google.com/search'
+
+retry_httpx = partial(
+    retry,
+    stop=stop_after_attempt(2),
+    wait=wait_fixed(2),
+    retry=retry_if_exception_type(httpx.HTTPError),
+    reraise=True,
+)
 
 
 def search(
@@ -63,60 +72,17 @@ def search(
     return results
 
 
-@retry(
-    stop=stop_after_attempt(2),
-    wait=wait_fixed(2),
-    retry=retry_if_exception_type(httpx.HTTPError),
-    reraise=True,
-)
-def _request(
-    query: str,
-    mode: Literal['news'] | Literal['search'],
-    number: int,
-    offset: int,
-    safe: bool,
-    region: str | None,
-    proxy: Proxy | None,
-) -> str:
-    params = {
-        'q': query,
-        'num': number,
-        'start': offset,
-        'safe': 'active' if safe else 'off',
-    }
-
-    if region:
-        params['gl'] = region
-    if mode == 'news':
-        params['tbm'] = 'nws'
-
-    cookies = {'CONSENT': 'PENDING+987', 'SOCS': 'CAESHAgBEhIaAB'}
-
-    headers = {
-        'Accept': 'text/html, text/plain, text/sgml, text/css, */*;q=0.01',
-        'Accept-Encoding': 'gzip, compress, bzip2',
-        'Accept-Language': 'en',
-        'User-Agent': generate_useragent(),
-    }
-
-    httpx_proxy = proxy.to_httpx_proxy_url() if proxy else None
-    with httpx.Client(proxy=httpx_proxy, headers=headers, cookies=cookies) as client:
-        resp = client.get(BASE_URL, params=params)
-        resp.raise_for_status()
-        return resp.text
-
-
 async def async_search(
-        query: str = '',
-        filters: Filters | None = None,
-        mode: Literal['news'] | Literal['search'] = 'search',
-        count: int = 10,
-        offset: int = 0,
-        unique: bool = False,
-        safe: bool = True,
-        region: str | None = None,
-        proxy: Proxy | None = None,
-        sleep_time: int = 0.5,
+    query: str = '',
+    filters: Filters | None = None,
+    mode: Literal['news'] | Literal['search'] = 'search',
+    count: int = 10,
+    offset: int = 0,
+    unique: bool = False,
+    safe: bool = True,
+    region: str | None = None,
+    proxy: Proxy | None = None,
+    sleep_time: int = 0.5,
 ):
     assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
 
@@ -154,21 +120,15 @@ async def async_search(
     return results
 
 
-@retry(
-    stop=stop_after_attempt(2),
-    wait=wait_fixed(2),
-    retry=retry_if_exception_type(httpx.HTTPError),
-    reraise=True,
-)
-async def _async_request(
-        query: str,
-        mode: Literal['news'] | Literal['search'],
-        number: int,
-        offset: int,
-        safe: bool,
-        region: str | None,
-        proxy: Proxy | None,
-) -> str:
+def generate_request_params(
+    query: str,
+    mode: Literal['news'] | Literal['search'],
+    number: int,
+    offset: int,
+    safe: bool,
+    region: str | None,
+    proxy: Proxy | None,
+) -> tuple[dict, dict, dict, str | None]:
     params = {
         'q': query,
         'num': number,
@@ -191,6 +151,38 @@ async def _async_request(
     }
 
     httpx_proxy = proxy.to_httpx_proxy_url() if proxy else None
+
+    return params, cookies, headers, httpx_proxy
+
+
+@retry_httpx()
+def _request(
+    query: str,
+    mode: Literal['news'] | Literal['search'],
+    number: int,
+    offset: int,
+    safe: bool,
+    region: str | None,
+    proxy: Proxy | None,
+) -> str:
+    params, cookies, headers, httpx_proxy = generate_request_params(query, mode, number, offset, safe, region, proxy)
+    with httpx.Client(proxy=httpx_proxy, headers=headers, cookies=cookies) as client:
+        resp = client.get(BASE_URL, params=params)
+        resp.raise_for_status()
+        return resp.text
+
+
+@retry_httpx()
+async def _async_request(
+    query: str,
+    mode: Literal['news'] | Literal['search'],
+    number: int,
+    offset: int,
+    safe: bool,
+    region: str | None,
+    proxy: Proxy | None,
+) -> str:
+    params, cookies, headers, httpx_proxy = generate_request_params(query, mode, number, offset, safe, region, proxy)
     async with httpx.AsyncClient(proxy=httpx_proxy, headers=headers, cookies=cookies) as client:
         resp = await client.get(BASE_URL, params=params)
         resp.raise_for_status()
