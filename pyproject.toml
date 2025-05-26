@@ -7,7 +7,7 @@ name = "SearchAI"
 version = "0.1.0"
 description = "Google Search & News tool with advanced filters and LLM-friendly output formats!"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.10"
 dependencies = [
     "html2text>=2025.4.15",
     "httpx[socks]>=0.28.1",
@@ -36,6 +36,3 @@ select = ["I", "TID"]
 
 [tool.ruff.format]
 quote-style = "single"
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]

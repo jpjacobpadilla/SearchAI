@@ -1,5 +1,5 @@
 .DS_Store
-_tests/
+private/
 
 # Python-generated files
 __pycache__/
