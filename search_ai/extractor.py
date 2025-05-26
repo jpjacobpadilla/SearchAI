@@ -8,9 +8,9 @@ from playwright.async_api import async_playwright, Browser as AsyncBrowser
 
 
 PLAYWRIGHT_CONFIG = {
-    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "viewport": {"width": 1280, "height": 720},
-    "locale": "en-US",
+    'user_agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'viewport': {'width': 1280, 'height': 720},
+    'locale': 'en-US',
 }
 
 
@@ -39,9 +39,7 @@ async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]
     url_list = url if isinstance(url, list) else [url]
 
     async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(
-            headless=True, proxy=proxy.to_playwright_proxy() if proxy else None
-        )
+        browser = await playwright.chromium.launch(headless=True, proxy=proxy.to_playwright_proxy() if proxy else None)
 
         tasks = [_get_page_source(url, semaphore, browser) for url in url_list]
         results = await asyncio.gather(*tasks)
@@ -51,9 +49,7 @@ async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]
     return results[0] if isinstance(url, str) else results
 
 
-async def _get_page_source(
-    url: str, semaphore: asyncio.Semaphore, browser: AsyncBrowser
-) -> str:
+async def _get_page_source(url: str, semaphore: asyncio.Semaphore, browser: AsyncBrowser) -> str:
     if not valid_type(url):
         return ''
 
@@ -62,7 +58,7 @@ async def _get_page_source(
         page = await context.new_page()
 
         try:
-            await page.goto(url, wait_until="domcontentloaded", timeout=6000)
+            await page.goto(url, wait_until='domcontentloaded', timeout=6000)
             await page.wait_for_timeout(2000)  # Wait an extra 2s for JS to populate content
         except Exception:
             page_source = ''

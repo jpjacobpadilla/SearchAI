@@ -10,7 +10,7 @@ def extract_metadata(page_source: str) -> dict:
     except Exception:
         return {}
 
-    page_title = tree.xpath("//head/title/text()")
+    page_title = tree.xpath('//head/title/text()')
     page_description = tree.xpath('//head/meta[@name="description"]/@content')
     author = tree.xpath('//head/meta[@name="author"]/@content')
     twitter_handle = tree.xpath('//head/meta[@name="twitter:site"]/@content')
@@ -18,13 +18,13 @@ def extract_metadata(page_source: str) -> dict:
     result = {}
 
     if page_title:
-        result["title"] = page_title[0]
+        result['title'] = page_title[0]
     if page_description and valid_description_metadata(page_description[0]):
-        result["description"] = page_description[0]
+        result['description'] = page_description[0]
     if author:
-        result["author"] = author[0]
+        result['author'] = author[0]
     if twitter_handle:
-        result["twitter"] = twitter_handle[0]
+        result['twitter'] = twitter_handle[0]
 
     return result
 
@@ -37,9 +37,7 @@ def valid_description_metadata(desc: str) -> bool:
         return True
 
 
-def generate_markdown(
-        page_source: str, ignore_links: bool, ignore_images: bool
-) -> str:
+def generate_markdown(page_source: str, ignore_links: bool, ignore_images: bool) -> str:
     text_maker = html2text.HTML2Text()
     text_maker.ignore_links = ignore_links
     text_maker.ignore_images = ignore_images

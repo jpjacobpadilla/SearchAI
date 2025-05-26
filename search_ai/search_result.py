@@ -23,10 +23,10 @@ class BaseSearchResult(BaseModel):
         return self.__str__()
 
     def _basic_markdown(self) -> str:
-        parts = [f"**Title:** {self.title}", f"**Link:** {self.link}"]
+        parts = [f'**Title:** {self.title}', f'**Link:** {self.link}']
         if self.description:
-            parts.append(f"**Description:** {self.description}")
-        return "\n".join(parts)
+            parts.append(f'**Description:** {self.description}')
+        return '\n'.join(parts)
 
     def _extended_markdown(
         self,
@@ -43,55 +43,45 @@ class BaseSearchResult(BaseModel):
 
         metadata = extract_metadata(page_source)
 
-        parts = [
-            f"**Title:** {metadata.get('title') or self.title}",
-            f"**Link:** {self.link}",
-        ]
+        parts = [f'**Title:** {metadata.get("title") or self.title}', f'**Link:** {self.link}']
 
-        if metadata.get("description"):
-            parts.append(f"**Description:** {metadata['description']}")
+        if metadata.get('description'):
+            parts.append(f'**Description:** {metadata["description"]}')
         elif self.description:
-            parts.append(f"**Description:** {self.description}")
+            parts.append(f'**Description:** {self.description}')
 
-        if metadata.get("author"):
-            parts.append(f"**Author:** {metadata['author']}")
-        if metadata.get("twitter"):
-            parts.append(f"**Twitter:** {metadata['twitter']}")
+        if metadata.get('author'):
+            parts.append(f'**Author:** {metadata["author"]}')
+        if metadata.get('twitter'):
+            parts.append(f'**Twitter:** {metadata["twitter"]}')
 
         if markdown:
-            parts.append("")  # Extra break between metadata and page data
-            parts.append("## Page Preview:\n")
+            parts.append('')  # Extra break between metadata and page data
+            parts.append('## Page Preview:\n')
             parts.append(markdown[:content_length].strip())
 
-        return "\n".join(parts)
+        return '\n'.join(parts)
 
     def _extended_json(
-        self,
-        page_source: str,
-        content_length: int,
-        ignore_links: bool = False,
-        ignore_images: bool = True,
+        self, page_source: str, content_length: int, ignore_links: bool = False, ignore_images: bool = True
     ) -> dict:
         metadata = extract_metadata(page_source)
         markdown = generate_markdown(page_source, ignore_links, ignore_images)
 
-        combined_data = {
-            "title": metadata.get("title") or self.title,
-            "link": str(self.link),
-        }
+        combined_data = {'title': metadata.get('title') or self.title, 'link': str(self.link)}
 
-        if metadata.get("description"):
-            combined_data["description"] = metadata["description"]
+        if metadata.get('description'):
+            combined_data['description'] = metadata['description']
         elif self.description:
-            combined_data["description"] = self.description
+            combined_data['description'] = self.description
 
-        if metadata.get("author"):
-            combined_data["author"] = metadata["author"]
-        if metadata.get("twitter"):
-            combined_data["twitter"] = metadata["twitter"]
+        if metadata.get('author'):
+            combined_data['author'] = metadata['author']
+        if metadata.get('twitter'):
+            combined_data['twitter'] = metadata['twitter']
 
         if markdown:
-            combined_data["page_preview"] = markdown[:content_length]
+            combined_data['page_preview'] = markdown[:content_length]
 
         return combined_data
 
@@ -109,9 +99,7 @@ class SearchResult(BaseSearchResult):
             return self._basic_markdown()
 
         page_source = get_page_sync(str(self.link), self._proxy)
-        return self._extended_markdown(
-            page_source, content_length, only_page_content, ignore_links, ignore_images
-        )
+        return self._extended_markdown(page_source, content_length, only_page_content, ignore_links, ignore_images)
 
     def json(
         self,
@@ -125,9 +113,7 @@ class SearchResult(BaseSearchResult):
             return super().model_dump(**kwargs)
 
         page_source = get_page_sync(str(self.link), self._proxy)
-        return self._extended_json(
-            page_source, content_length, ignore_links, ignore_images
-        )
+        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
 
 
 class AsyncSearchResult(BaseSearchResult):
@@ -143,9 +129,7 @@ class AsyncSearchResult(BaseSearchResult):
             return self._basic_markdown()
 
         page_source = await get_page(str(self.link), self._proxy)
-        return self._extended_markdown(
-            page_source, content_length, only_page_content, ignore_links, ignore_images
-        )
+        return self._extended_markdown(page_source, content_length, only_page_content, ignore_links, ignore_images)
 
     async def json(
         self,
@@ -159,9 +143,7 @@ class AsyncSearchResult(BaseSearchResult):
             return super().model_dump(**kwargs)
 
         page_source = await get_page(str(self.link), self._proxy)
-        return self._extended_json(
-            page_source, content_length, ignore_links, ignore_images
-        )
+        return self._extended_json(page_source, content_length, ignore_links, ignore_images)
 
 
 class SearchResults(list):
@@ -177,29 +159,21 @@ class SearchResults(list):
             content = [result._basic_markdown() for result in self]
 
         else:
-            page_sources = get_page_sync(
-                [str(result.link) for result in self], self._proxy
-            )
+            page_sources = get_page_sync([str(result.link) for result in self], self._proxy)
             content = [
-                result._extended_markdown(
-                    page_source=page_source, content_length=content_length, **kwargs
-                )
+                result._extended_markdown(page_source=page_source, content_length=content_length, **kwargs)
                 for result, page_source in zip(self, page_sources)
             ]
 
-        return "# Search Results\n\n" + "\n----------\n".join(content)
+        return '# Search Results\n\n' + '\n----------\n'.join(content)
 
-    def json(
-        self, extend: bool = False, content_length: int = 400, **kwargs
-    ) -> list[dict]:
+    def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
 
         page_sources = get_page_sync([str(result.link) for result in self], self._proxy)
         return [
-            result._extended_json(
-                page_source=page_source, content_length=content_length, **kwargs
-            )
+            result._extended_json(page_source=page_source, content_length=content_length, **kwargs)
             for result, page_source in zip(self, page_sources)
         ]
 
@@ -209,37 +183,25 @@ class AsyncSearchResults(list):
         super().__init__(results)
         self._proxy = _proxy
 
-    async def markdown(
-        self, extend: bool = False, content_length: int = 400, **kwargs
-    ) -> str:
+    async def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
         if not extend:
             content = [result._basic_markdown() for result in self]
 
         else:
-            page_sources = await get_page(
-                [str(result.link) for result in self], self._proxy
-            )
+            page_sources = await get_page([str(result.link) for result in self], self._proxy)
             content = [
-                result._extended_markdown(
-                    page_source=page_source, content_length=content_length, **kwargs
-                )
+                result._extended_markdown(page_source=page_source, content_length=content_length, **kwargs)
                 for result, page_source in zip(self, page_sources)
             ]
 
-        return "# Search Results\n\n" + "\n----------\n".join(content)
+        return '# Search Results\n\n' + '\n----------\n'.join(content)
 
-    async def json(
-        self, extend: bool = False, content_length: int = 400, **kwargs
-    ) -> list[dict]:
+    async def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
 
-        page_sources = await get_page(
-            [str(result.link) for result in self], self._proxy
-        )
+        page_sources = await get_page([str(result.link) for result in self], self._proxy)
         return [
-            result._extended_json(
-                page_source=page_source, content_length=content_length, **kwargs
-            )
+            result._extended_json(page_source=page_source, content_length=content_length, **kwargs)
             for result, page_source in zip(self, page_sources)
         ]

@@ -27,3 +27,12 @@ dev = [
 [tool.setuptools.packages.find]
 include = ["search_ai"]
 
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["I", "TID"]
+
+[tool.ruff.format]
+quote-style = "single"
+

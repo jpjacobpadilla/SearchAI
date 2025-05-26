@@ -3,10 +3,7 @@ import random
 from typing import Literal
 
 import httpx
-from tenacity import (
-    retry, stop_after_attempt,
-    wait_exponential, retry_if_exception_type
-)
+from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from .proxy import Proxy
 from .filters import Filters
@@ -17,16 +14,16 @@ BASE_URL = 'https://www.google.com/search'
 
 
 def search(
-        query: str = '',
-        filters: Filters | None = None,
-        mode: Literal['news'] | Literal['search'] = 'search',
-        count: int = 10,
-        offset: int = 0,
-        unique: bool = False,
-        safe: bool = True,
-        region: str | None = None,
-        proxy: Proxy | None = None,
-        sleep_time: int = 0.5
+    query: str = '',
+    filters: Filters | None = None,
+    mode: Literal['news'] | Literal['search'] = 'search',
+    count: int = 10,
+    offset: int = 0,
+    unique: bool = False,
+    safe: bool = True,
+    region: str | None = None,
+    proxy: Proxy | None = None,
+    sleep_time: int = 0.5,
 ):
     assert mode in ('news', 'search'), '"mode" must be "news" or "search"'
 
@@ -58,48 +55,41 @@ def search(
 
         offset += len(new_results)
 
-        twenty_percent = sleep_time * .10
+        twenty_percent = sleep_time * 0.10
         time.sleep(random.uniform(sleep_time - twenty_percent, sleep_time + twenty_percent))
 
     return results
+
 
 @retry(
     stop=stop_after_attempt(3),
     wait=wait_exponential(multiplier=1.5, min=1, max=10),
     retry=retry_if_exception_type(httpx.HTTPError),
-    reraise=True
+    reraise=True,
 )
 def _request(
-        query: str,
-        mode: Literal['news'] | Literal['search'],
-        number: int,
-        offset: int,
-        safe: bool,
-        region: str | None,
-        proxy: Proxy | None
+    query: str,
+    mode: Literal['news'] | Literal['search'],
+    number: int,
+    offset: int,
+    safe: bool,
+    region: str | None,
+    proxy: Proxy | None,
 ) -> str:
-    params = {
-        'q': query,
-        'num': number,
-        'start': offset,
-        'safe': 'active' if safe else 'off'
-    }
+    params = {'q': query, 'num': number, 'start': offset, 'safe': 'active' if safe else 'off'}
 
     if region:
         params['gl'] = region
     if mode == 'news':
         params['tbm'] = 'nws'
 
-    cookies = {
-        'CONSENT': 'PENDING+987',
-        'SOCS': 'CAESHAgBEhIaAB'
-    }
+    cookies = {'CONSENT': 'PENDING+987', 'SOCS': 'CAESHAgBEhIaAB'}
 
     headers = {
         'Accept': 'text/html, text/plain, text/sgml, text/css, */*;q=0.01',
         'Accept-Encoding': 'gzip, compress, bzip2',
         'Accept-Language': 'en',
-        'User-Agent': generate_useragent()
+        'User-Agent': generate_useragent(),
     }
 
     httpx_proxy = proxy.to_httpx_proxy_url() if proxy else None
@@ -128,13 +118,13 @@ def generate_useragent() -> str:
     else:
         minor = random.randint(0, 2)
         patch = 0
-    lynx_version = f"Lynx/{major}.{minor}.{patch}"
+    lynx_version = f'Lynx/{major}.{minor}.{patch}'
 
     # libwww-FM: realistically 2.14 ± small variance
-    libwww_version = f"libwww-FM/{random.choice([13,14,15])}"
+    libwww_version = f'libwww-FM/{random.choice([13, 14, 15])}'
 
     # SSL-MM: pin around 1.4.x
-    ssl_mm_version = f"SSL-MM/1.{random.randint(4,5)}.{random.randint(0,9)}"
+    ssl_mm_version = f'SSL-MM/1.{random.randint(4, 5)}.{random.randint(0, 9)}'
 
     # OpenSSL: legacy 1.1.x or modern 3.x (3.4–3.5)
     openssl_major = random.choice([1, 3])
@@ -143,12 +133,6 @@ def generate_useragent() -> str:
     else:
         openssl_minor = random.randint(4, 5)
     openssl_patch = random.randint(0, 9)
-    openssl_version = f"OpenSSL/{openssl_major}.{openssl_minor}.{openssl_patch}"
+    openssl_version = f'OpenSSL/{openssl_major}.{openssl_minor}.{openssl_patch}'
 
-    return f"{lynx_version} {libwww_version} {ssl_mm_version} {openssl_version}"
-
-
-
-
-
-
+    return f'{lynx_version} {libwww_version} {ssl_mm_version} {openssl_version}'

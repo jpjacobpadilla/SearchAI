@@ -6,10 +6,11 @@ from pydantic.types import StringConstraints
 from publicsuffix2 import PublicSuffixList
 
 
-FileType = Annotated[str, StringConstraints(pattern=r"^[a-zA-Z0-9]{2,10}$")]
-Keyword = Annotated[str, StringConstraints(pattern=r"^[^\s]+$")]
+FileType = Annotated[str, StringConstraints(pattern=r'^[a-zA-Z0-9]{2,10}$')]
+Keyword = Annotated[str, StringConstraints(pattern=r'^[^\s]+$')]
 
 psl = PublicSuffixList()
+
 
 def to_list(val: str | list[str] | None) -> list[str]:
     if val is None:
@@ -19,18 +20,18 @@ def to_list(val: str | list[str] | None) -> list[str]:
 
 def group_includes(values: list[str], op: str | None = None) -> str:
     if not values:
-        return ""
+        return ''
 
     if len(values) == 1:
-        return f"{op}:{values[0]}" if op else f'"{values[0]}"'
+        return f'{op}:{values[0]}' if op else f'"{values[0]}"'
 
     if op:
-        return f'({' | '.join(f'{op}:{v}' for v in values)})'
-    return f'({' | '.join(f'"{v}"' for v in values)})'
+        return f'({" | ".join(f"{op}:{v}" for v in values)})'
+    return f'({" | ".join(f'"{v}"' for v in values)})'
 
 
 def group_excludes(op: str, values: list[str]) -> list[str]:
-    return [f"-{op}:{v}" for v in values]
+    return [f'-{op}:{v}' for v in values]
 
 
 def validate_tld(v: str | list[str] | None):
@@ -47,32 +48,34 @@ def validate_tld(v: str | list[str] | None):
 
 
 class Filters(BaseModel):
-    sites: str | list[str] | None = Field(None, description="Only show results from specific domains")
-    tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description="Only show results from specific top-level domains (e.g., .gov, .edu)")
-    filetype: FileType | None = Field(None, description="Only show documents that are a specific file type. Note: Google only supports one filetype per search.")
-    https_only: bool = Field(False, description="Only show websites that support HTTPS")
+    # fmt: off
+    sites: str | list[str] | None = Field(None, description='Only show results from specific domains')
+    tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Only show results from specific top-level domains (e.g., .gov, .edu)')
+    filetype: FileType | None = Field(None, description='Only show documents that are a specific file type. Note: Google only supports one filetype per search.')
+    https_only: bool = Field(False, description='Only show websites that support HTTPS')
 
-    exclude_sites: str | list[str] | None = Field(None, description="Exclude results from specific domains")
-    exclude_tlds: str | list[str] | None = Field(None, description="Exclude results from specific top-level domains")
-    exclude_filetypes: FileType | list[FileType] | None = Field(None, description="Exclude documents with specific file types")
-    exclude_https: bool = Field(False, description="Exclude HTTPS pages")
+    exclude_sites: str | list[str] | None = Field(None, description='Exclude results from specific domains')
+    exclude_tlds: str | list[str] | None = Field(None, description='Exclude results from specific top-level domains')
+    exclude_filetypes: FileType | list[FileType] | None = Field(None, description='Exclude documents with specific file types')
+    exclude_https: bool = Field(False, description='Exclude HTTPS pages')
 
-    before: date | None = Field(None, description="Only show results before this date")
-    after: date | None = Field(None, description="Only show results after this date")
+    before: date | None = Field(None, description='Only show results before this date')
+    after: date | None = Field(None, description='Only show results after this date')
 
-    keywords: Keyword | list[Keyword] | None = Field(None, description="Require specific words anywhere in the page")
-    exact_phrases: str | list[str] | None = Field(None, description="Include results with exact phrases")
+    keywords: Keyword | list[Keyword] | None = Field(None, description='Require specific words anywhere in the page')
+    exact_phrases: str | list[str] | None = Field(None, description='Include results with exact phrases')
 
-    exclude_keywords: Keyword | list[Keyword] | None = Field(None, description="Exclude pages containing certain words")
-    exclude_exact_phrases: str | list[str] | None = Field(None, description="Exclude results with exact phrases")
+    exclude_keywords: Keyword | list[Keyword] | None = Field(None, description='Exclude pages containing certain words')
+    exclude_exact_phrases: str | list[str] | None = Field(None, description='Exclude results with exact phrases')
 
-    in_title: str | list[str] | None = Field(None, description="Require specific words in the title")
-    in_url: str | list[str] | None = Field(None, description="Require specific words in the URL")
-    in_text: str | list[str] | None = Field(None, description="Require specific words in the page text")
+    in_title: str | list[str] | None = Field(None, description='Require specific words in the title')
+    in_url: str | list[str] | None = Field(None, description='Require specific words in the URL')
+    in_text: str | list[str] | None = Field(None, description='Require specific words in the page text')
 
-    not_in_title: str | list[str] | None = Field(None, description="Exclude pages with specific words in the title")
-    not_in_url: str | list[str] | None = Field(None, description="Exclude pages with specific words in the URL")
-    not_in_text: str | list[str] | None = Field(None, description="Exclude pages with specific words in the page text")
+    not_in_title: str | list[str] | None = Field(None, description='Exclude pages with specific words in the title')
+    not_in_url: str | list[str] | None = Field(None, description='Exclude pages with specific words in the URL')
+    not_in_text: str | list[str] | None = Field(None, description='Exclude pages with specific words in the page text')
+    # fmt: on
 
     def compile_filters(self) -> str:
         filters = []
@@ -80,7 +83,7 @@ class Filters(BaseModel):
         filters.append(group_includes(to_list(self.sites), 'site'))
         filters.append(group_includes(to_list(self.tlds), 'site'))
 
-        filters.append(group_includes(to_list(self.filetype), "filetype"))
+        filters.append(group_includes(to_list(self.filetype), 'filetype'))
         filters.append(group_includes(to_list(self.keywords)))
 
         if self.exact_phrases:
@@ -88,34 +91,37 @@ class Filters(BaseModel):
             filters.extend([f'"{phrase}"' for phrase in phrase_list])
 
         if self.https_only:
-            filters.append("inurl:https")
+            filters.append('inurl:https')
 
-        filters.extend([f"intitle:{w}" for w in to_list(self.in_title)])
-        filters.extend([f"inurl:{w}" for w in to_list(self.in_url)])
-        filters.extend([f"intext:{w}" for w in to_list(self.in_text)])
+        filters.extend([f'intitle:{w}' for w in to_list(self.in_title)])
+        filters.extend([f'inurl:{w}' for w in to_list(self.in_url)])
+        filters.extend([f'intext:{w}' for w in to_list(self.in_text)])
 
         if self.before:
-            filters.append(f"before:{self.before.isoformat()}")
+            filters.append(f'before:{self.before.isoformat()}')
         if self.after:
-            filters.append(f"after:{self.after.isoformat()}")
+            filters.append(f'after:{self.after.isoformat()}')
 
         # Negative Filters
         if self.exclude_exact_phrases:
-            phrase_list = self.exclude_exact_phrases if isinstance(self.exclude_exact_phrases, list) else [self.exclude_exact_phrases]
+            phrase_list = (
+                self.exclude_exact_phrases
+                if isinstance(self.exclude_exact_phrases, list)
+                else [self.exclude_exact_phrases]
+            )
             filters.extend([f'-"{phrase}"' for phrase in phrase_list])
 
-        filters.extend(group_excludes("site", to_list(self.exclude_sites)))
-        filters.extend(group_excludes("site", to_list(self.exclude_tlds)))
+        filters.extend(group_excludes('site', to_list(self.exclude_sites)))
+        filters.extend(group_excludes('site', to_list(self.exclude_tlds)))
 
         if self.exclude_https:
-            filters.append("-inurl:https")
+            filters.append('-inurl:https')
 
-        filters.extend(group_excludes("filetype", to_list(self.exclude_filetypes)))
-        filters.extend([f"-{w}" for w in to_list(self.exclude_keywords)])
+        filters.extend(group_excludes('filetype', to_list(self.exclude_filetypes)))
+        filters.extend([f'-{w}' for w in to_list(self.exclude_keywords)])
 
-        filters.extend([f"-inurl:{w}" for w in to_list(self.not_in_url)])
-        filters.extend([f"-intitle:{w}" for w in to_list(self.not_in_title)])
-        filters.extend([f"-intext:{w}" for w in to_list(self.not_in_text)])
+        filters.extend([f'-inurl:{w}' for w in to_list(self.not_in_url)])
+        filters.extend([f'-intitle:{w}' for w in to_list(self.not_in_title)])
+        filters.extend([f'-intext:{w}' for w in to_list(self.not_in_text)])
 
-        return " ".join([f for f in filters if f])
-
+        return ' '.join([f for f in filters if f])
