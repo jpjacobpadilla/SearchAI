@@ -3,7 +3,7 @@ import random
 from typing import Literal
 
 import httpx
-from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+from tenacity import retry, stop_after_attempt, wait_fixed, retry_if_exception_type
 
 from .proxy import Proxy
 from .filters import Filters
@@ -62,8 +62,8 @@ def search(
 
 
 @retry(
-    stop=stop_after_attempt(3),
-    wait=wait_exponential(multiplier=1.5, min=1, max=10),
+    stop=stop_after_attempt(2),
+    wait=wait_fixed(2),
     retry=retry_if_exception_type(httpx.HTTPError),
     reraise=True,
 )
@@ -76,7 +76,12 @@ def _request(
     region: str | None,
     proxy: Proxy | None,
 ) -> str:
-    params = {'q': query, 'num': number, 'start': offset, 'safe': 'active' if safe else 'off'}
+    params = {
+        'q': query,
+        'num': number,
+        'start': offset,
+        'safe': 'active' if safe else 'off',
+    }
 
     if region:
         params['gl'] = region

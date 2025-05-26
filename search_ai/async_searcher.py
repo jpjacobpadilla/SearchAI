@@ -9,7 +9,7 @@ from .proxy import Proxy
 from .filters import Filters
 from .parse import parse_search
 from .utils import generate_useragent
-from .search_result import SearchResult, SearchResults
+from .search_result import AsyncSearchResults, AsyncSearchResult
 
 BASE_URL = 'https://www.google.com/search'
 
@@ -31,7 +31,7 @@ async def async_search(
     filters = filters.compile_filters() if filters else ''
     compiled_query = f'{query}{" " if filters else ""}{filters}'
 
-    results = SearchResults(results=[], _proxy=proxy)
+    results = AsyncSearchResults(results=[], _proxy=proxy)
     result_set = set()
 
     while len(results) < count:
@@ -50,7 +50,7 @@ async def async_search(
                 else:
                     result_set.add(new_result['link'])
 
-            results.append(SearchResult(**new_result, _proxy=proxy))
+            results.append(AsyncSearchResult(**new_result, _proxy=proxy))
             if len(results) == count:
                 return results
 
@@ -77,7 +77,12 @@ async def _request(
     region: str | None,
     proxy: Proxy | None,
 ) -> str:
-    params = {'q': query, 'num': number, 'start': offset, 'safe': 'active' if safe else 'off'}
+    params = {
+        'q': query,
+        'num': number,
+        'start': offset,
+        'safe': 'active' if safe else 'off',
+    }
 
     if region:
         params['gl'] = region
