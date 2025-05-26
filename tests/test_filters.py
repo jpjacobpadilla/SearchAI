@@ -24,9 +24,13 @@ from search_ai import Filters
     ('after', date(2022, 11, 30), 'after:2022-11-30'),
     ('after', date(2099, 12, 31), 'after:2099-12-31'),
 
-    ('keywords', 'ai', '"ai"'),
-    ('keywords', ['ai', 'ml'], '("ai" | "ml")'),
-    ('keywords', ['ai'], '"ai"'),
+    ("all_keywords", "ai", '"ai"'),
+    ("all_keywords", ["ai", "ml"], '"ai" "ml"'),
+    ("all_keywords", ["ai"], '"ai"'),
+
+    ("any_keywords", "ai", '"ai"'),
+    ("any_keywords", ["ai", "ml"], '("ai" | "ml")'),
+    ("any_keywords", ["ai"], '"ai"'),
 
     ('exact_phrases', 'openai api', '"openai api"'),
     ('exact_phrases', ['foo bar', 'baz qux'], '"foo bar" "baz qux"'),
@@ -51,8 +55,9 @@ from search_ai import Filters
 
     ('exclude_https', True, '-inurl:https'),
 
-    ('exclude_keywords', 'ads', '-ads'),
-    ('exclude_keywords', ['spam', 'click'], '-spam -click'),
+    ('exclude_all_keywords', 'ads', '-ads'),
+    ('exclude_all_keywords', ['spam', 'click'], '-spam -click'),
+    ('exclude_all_keywords', ['ads'], '-ads'),
 
     ('exclude_exact_phrases', 'bad ad', '-"bad ad"'),
     ('exclude_exact_phrases', ['fake news', 'scam'], '-"fake news" -"scam"'),
@@ -79,11 +84,13 @@ def test_individual_fields(field, value, expected):
     ("exclude_filetypes", "we!rd"),
     ("exclude_filetypes", ["bad!", "!!"]),
 
-    ("keywords", "with space"),
-    ("keywords", ["ok", "bad word"]),
+    ("all_keywords", "with space"),
+    ("all_keywords", "with space"),
+    ("any_keywords", ["ok", "bad word"]),
+    ("any_keywords", ["ok", "bad word"]),
 
-    ("exclude_keywords", "white space"),
-    ("exclude_keywords", ["fine", "break this"]),
+    ("exclude_all_keywords", "white space"),
+    ("exclude_all_keywords", ["fine", "break this"]),
 
     ("tlds", ".invalidtld"),
     ("tlds",  [".edu", ".badzone"]),
@@ -92,14 +99,22 @@ def test_individual_fields(field, value, expected):
     ("exclude_tlds", [".edu", ".badzone"])
 ])
 def test_field_validation(field, value):
-    with pytest.raises(ValueError, match=".*"):
+    with pytest.raises(ValueError, match=r'.*'):
         Filters(**{field: value})
 
 
 @pytest.mark.parametrize("kwargs, expected", [
     (
-        {"sites": "example.com", "keywords": "ai"},
+        {"sites": "example.com", "all_keywords": "ai"},
         'site:example.com "ai"'
+    ),
+    (
+            {"tlds": ".com", "all_keywords": ["ai", "llm"]},
+            'site:.com "ai" "llm"'
+    ),
+    (
+            {"tlds": ".com", "any_keywords": ["ai", "llm"]},
+            'site:.com ("ai" | "llm")'
     ),
     (
         {
@@ -114,7 +129,7 @@ def test_field_validation(field, value):
     (
         {
             "exclude_sites": ["spam.com"],
-            "exclude_keywords": ["ads", "clickbait"],
+            "exclude_all_keywords": ["ads", "clickbait"],
             "not_in_url": "ref",
             "exclude_https": True
         },
@@ -134,7 +149,7 @@ def test_field_validation(field, value):
         {
             "filetype": "ppt",
             "exclude_filetypes": ["exe", "bat"],
-            "keywords": ["presentation", "slides"],
+            "any_keywords": ["presentation", "slides"],
         },
         'filetype:ppt ("presentation" | "slides") -filetype:exe -filetype:bat'
     ),
@@ -150,9 +165,17 @@ def test_field_validation(field, value):
         {
             "sites": "example.org",
             "in_text": "summary",
-            "exclude_keywords": "draft"
+            "exclude_all_keywords": "draft"
         },
         'site:example.org intext:summary -draft'
+    ),
+    (
+            {
+                "sites": "example.org",
+                "in_text": "summary",
+                "exclude_all_keywords": ["draft", "ai", "bot"]
+            },
+            'site:example.org intext:summary -draft -ai -bot'
     ),
     (
         {
