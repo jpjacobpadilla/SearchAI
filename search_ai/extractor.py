@@ -18,6 +18,10 @@ PLAYWRIGHT_CONFIG = {
 def get_page_sync(url: str, proxy: Proxy | None) -> str: ...
 @overload
 def get_page_sync(url: list[str], proxy: Proxy | None) -> list[str]: ...
+@overload
+async def get_page(url: str, proxy: Proxy | None) -> str: ...
+@overload
+async def get_page(url: list[str], proxy: Proxy | None) -> list[str]: ...
 
 
 def get_page_sync(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
@@ -26,12 +30,6 @@ def get_page_sync(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
         return asyncio.run_coroutine_threadsafe(get_page(url, proxy), loop).result()
     except RuntimeError:
         return asyncio.run(get_page(url, proxy))
-
-
-@overload
-async def get_page(url: str, proxy: Proxy | None) -> str: ...
-@overload
-async def get_page(url: list[str], proxy: Proxy | None) -> list[str]: ...
 
 
 async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
