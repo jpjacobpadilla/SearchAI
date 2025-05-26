@@ -55,7 +55,7 @@ class Filters(BaseModel):
     https_only: bool = Field(False, description='Only show websites that support HTTPS')
 
     exclude_sites: str | list[str] | None = Field(None, description='Exclude results from specific domains')
-    exclude_tlds: str | list[str] | None = Field(None, description='Exclude results from specific top-level domains')
+    exclude_tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Exclude results from specific top-level domains')
     exclude_filetypes: FileType | list[FileType] | None = Field(None, description='Exclude documents with specific file types')
     exclude_https: bool = Field(False, description='Exclude HTTPS pages')
 
