@@ -46,9 +46,21 @@ SearchResult(title="25 of the best large language models in 2025 - TechTarget", 
 SearchResult(title="The Best LLM Is.... (A breakdown for every category) - YouTube", link="https://www.youtube.com/watch?v=0K66T6J1pVc", description="Comparing large language models can be confusing, so I created a benchmarking system that ranks them in 17 key categories—like search, ...")
 ```
 
-If you just want the titles from the results, use the following code:
+### Using filters
+
 
 ```python
+from search_ai import search, Filters
+
+search_filters = Filters(
+    in_title="python",              # Only include results with "python" in the title
+    tlds=[".edu", ".org"],          # Restrict results to .edu and .org domains
+    https_only=True,                # Only include websites that support HTTPS
+    exclude_sites='quora.com',      # Exclude results from quora.com
+    exclude_filetypes='pdf'         # Exclude PDF documents from results
+)
+
+results = search(filters=search_filters)
 for result in results:
     print(result.title)
 ```
@@ -56,19 +68,17 @@ for result in results:
 Output:
 
 ```plaintext
-LLM Leaderboard 2025 - Vellum AI
-What is your favorite LLM right now? : r/singularity - Reddit
-Top 9 Large Language Models as of May 2025 | Shakudo
-The best large language models (LLMs) in 2025 - Zapier
-LLM Rankings - OpenRouter
-Best LLM Benchmarks for code? - Cursor - Community Forum
-Best Small LLM For Rag - Models - Hugging Face Forums
-LLM Leaderboard - Compare GPT-4o, Llama 3, Mistral, Gemini ...
-25 of the best large language models in 2025 - TechTarget
-The Best LLM Is.... (A breakdown for every category) - YouTube
+Welcome to Python.org
+Python Tutorial - W3Schools
+Python (programming language) - Wikipedia
+Learn Python - Free Interactive Python Tutorial
+CS50's Introduction to Programming with Python | Harvard University
+Real Python: Python Tutorials
+Python for Everybody Specialization - Coursera
+scikit-learn: machine learning in Python — scikit-learn 1.6.1 ...
+Table Of Contents - Learn Python the Hard Way
+Python Institute - PROGRAM YOUR FUTURE
 ```
-
-### Using filters
 
 ### Regional targeting
 

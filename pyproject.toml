@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "search-ai-core"
-version = "0.1.2"
+version = "0.1.3"
 description = "Google Search & News tool with advanced filters and LLM-friendly output formats!"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"
