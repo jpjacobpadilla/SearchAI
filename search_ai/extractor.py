@@ -26,8 +26,14 @@ async def get_page(url: list[str], proxy: Proxy | None) -> list[str]: ...
 
 def get_page_sync(url: str | list[str], proxy: Proxy | None) -> str | list[str]:
     try:
-        loop = asyncio.get_running_loop()
-        return asyncio.run_coroutine_threadsafe(get_page(url, proxy), loop).result()
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            import nest_asyncio
+
+            nest_asyncio.apply()
+            return asyncio.run(get_page(url, proxy))
+        else:
+            return loop.run_until_complete(get_page(url, proxy))
     except RuntimeError:
         return asyncio.run(get_page(url, proxy))
 
