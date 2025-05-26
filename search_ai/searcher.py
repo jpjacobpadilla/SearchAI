@@ -20,7 +20,7 @@ def search(
         query: str = '',
         filters: Filters | None = None,
         mode: Literal['news'] | Literal['search'] = 'search',
-        length: int = 5,
+        count: int = 5,
         offset: int = 0,
         unique: bool = False,
         safe: bool = True,
@@ -37,8 +37,8 @@ def search(
     results = SearchResults(results=[], _proxy=proxy)
     result_set = set()
 
-    while len(results) < length:
-        response = _request(compiled_query, mode, length + 1, lang, offset, safe, region, proxy)
+    while len(results) < count:
+        response = _request(compiled_query, mode, count + 1, lang, offset, safe, region, proxy)
 
         new_results = parse_search(response)
 
@@ -50,7 +50,7 @@ def search(
                     result_set.add(new_result['link'])
 
             results.append(SearchResult(**new_result, _proxy=proxy))
-            if len(results) == length:
+            if len(results) == count:
                 return results
 
         twenty_percent = sleep_time * .20

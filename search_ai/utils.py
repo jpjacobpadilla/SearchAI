@@ -5,7 +5,10 @@ from lxml import html, etree
 
 
 def extract_metadata(page_source: str) -> dict:
-    tree = html.fromstring(page_source)
+    try:
+        tree = html.fromstring(page_source)
+    except Exception:
+        return {}
 
     page_title = tree.xpath("//head/title/text()")
     page_description = tree.xpath('//head/meta[@name="description"]/@content')
@@ -50,6 +53,3 @@ def valid_type(url: str) -> bool:
     """
     mime, _ = mimetypes.guess_type(url)
     return mime in ('text/html', 'text/plain', 'application/xhtml+xml', None)
-
-
-
