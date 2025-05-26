@@ -1,10 +1,11 @@
 import asyncio
+import subprocess
 from typing import overload
 
 from .proxy import Proxy
 from .utils import valid_type
 
-from playwright.async_api import async_playwright, Browser as AsyncBrowser
+from playwright.async_api import async_playwright, Browser as AsyncBrowser, Error as PlaywrightError
 
 
 PLAYWRIGHT_CONFIG = {
@@ -42,15 +43,27 @@ async def get_page(url: str | list[str], proxy: Proxy | None) -> str | list[str]
     semaphore = asyncio.Semaphore(8)
     url_list = url if isinstance(url, list) else [url]
 
-    async with async_playwright() as playwright:
-        browser = await playwright.chromium.launch(headless=True, proxy=proxy.to_playwright_proxy() if proxy else None)
+    try:
+        async with async_playwright() as playwright:
+            browser = await playwright.chromium.launch(
+                headless=True, proxy=proxy.to_playwright_proxy() if proxy else None
+            )
 
-        tasks = [_get_page_source(url, semaphore, browser) for url in url_list]
-        results = await asyncio.gather(*tasks)
+            tasks = [_get_page_source(url, semaphore, browser) for url in url_list]
+            results = await asyncio.gather(*tasks)
+            await browser.close()
 
-        await browser.close()
+            return results[0] if isinstance(url, str) else results
 
-    return results[0] if isinstance(url, str) else results
+    except PlaywrightError as e:
+        if "Executable doesn't exist" in str(e) or 'Please run the following command to download new browsers' in str(
+            e
+        ):
+            print("Playwright browser not found. Running 'playwright install'...")
+            subprocess.run(['playwright', 'install', 'chromium'], check=True)
+            return await get_page(url, proxy)
+        else:
+            raise  # Unexpected error, re-raise
 
 
 async def _get_page_source(url: str, semaphore: asyncio.Semaphore, browser: AsyncBrowser) -> str:
