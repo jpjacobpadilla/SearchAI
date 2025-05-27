@@ -141,7 +141,7 @@ To achieve this functionality, SearchAI uses [Playwright](https://github.com/mic
 from websites. In addition to extracting the main content of a page, SearchAI also tries to find metadata on pages, such as
 an author name and twitter handle.
 
-Getting results in markdown -- example output [here](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/markdown_example.py):
+Getting results in markdown ([example](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/markdown_example.py)):
 
 ```python
 SearchResults.markdown(
@@ -153,7 +153,7 @@ SearchResults.markdown(
 )
 ```
 
-Getting results in json -- example output [here](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/json_example.py):
+Getting results in json ([example](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/json_example.py)):
 
 ```python
 SearchResults.json(
@@ -173,11 +173,11 @@ If you'd like to use proxies, you can create a proxy object using `Proxy` and pa
 from search_ai import Proxy, search
 
 proxy = Proxy(
-    protocol="http, socks5, etc...",
-    host="host",
-    port=1000,
-    username="optional password",
-    password="optional username"
+    protocol="[protocol]",
+    host="[host]",
+    port=9999,
+    username="optional username",
+    password="optional password"
 )
 
 search('query', proxy=proxy)
@@ -185,7 +185,7 @@ search('query', proxy=proxy)
 
 ### Async support
 
-SearchAI also support Asyncio! Instead of using `search`, use `async_search`. The
+SearchAI also supports Asyncio! Instead of using `search`, use `async_search`. The
 async version will return an `AsyncSearchResults` which will contain multiple instances of `AsyncSearchResult`.
 
 ```python
