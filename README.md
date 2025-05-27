@@ -197,5 +197,61 @@ await results.json(extend=True)
 
 ## 🧰 All filters
 
+You can narrow down searches by including filters like so:
+
+```python
+Filters(
+    sites="example.com",
+    tlds=[".edu", ".gov"],
+    filetype="pdf",
+    exclude_sites=["facebook.com", "twitter.com"],
+    after=date(2023, 1, 1),
+    in_title="python",
+    not_in_url=["login", "signup"]
+)
+```
+
+Here is a complete list of all the filters in SearchAI:
+
+| Filter                  | Description                                                             | Example (str)        | Example (list)                        |
+| ----------------------- | ----------------------------------------------------------------------- | -------------------- | ------------------------------------- |
+| `sites`                 | Only show results from specific domains                                 | `"example.com"`      | `["example.com", "another.com"]`      |
+| `tlds`                  | Only show results from specific top-level domains (e.g. `.gov`, `.edu`) | `".edu"`             | `[".edu", ".gov"]`                    |
+| `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`              | *N/A*                                 |
+| `https_only`            | Only show websites that support HTTPS                                   | `True`               | *N/A*                                 |
+| `exclude_sites`         | Exclude results from specific domains                                   | `"facebook.com"`     | `["facebook.com", "twitter.com"]`     |
+| `exclude_tlds`          | Exclude results from specific top-level domains                         | `".xyz"`             | `[".xyz", ".ru"]`                     |
+| `exclude_filetypes`     | Exclude documents with specific file types                              | `"doc"`              | `["doc", "xls"]`                      |
+| `exclude_https`         | Exclude HTTPS pages                                                     | `True`               | *N/A*                                 |
+| `before`                | Only show results before this date                                      | `date(2022, 12, 31)` | *N/A*                                 |
+| `after`                 | Only show results after this date                                       | `date(2023, 1, 1)`   | *N/A*                                 |
+| `any_keywords`          | Require at least one word anywhere in the page                          | `"python"`           | `["python", "django"]`                |
+| `all_keywords`          | Require all of these words somewhere in the page                        | `"ai"`               | `["ai", "ml", "nlp"]`                 |
+| `exact_phrases`         | Include results with exact phrases                                      | `"machine learning"` | `["deep learning", "language model"]` |
+| `exclude_all_keywords`  | Exclude pages containing certain words                                  | `"ads"`              | `["ads", "tracking"]`                 |
+| `exclude_exact_phrases` | Exclude results with exact phrases                                      | `"click here"`       | `["click here", "buy now"]`           |
+| `in_title`              | Require specific words in the title                                     | `"resume"`           | `["resume", "portfolio"]`             |
+| `in_url`                | Require specific words in the URL                                       | `"blog"`             | `["blog", "tutorial"]`                |
+| `in_text`               | Require specific words in the page text                                 | `"case study"`       | `["case study", "example"]`           |
+| `not_in_title`          | Exclude pages with specific words in the title                          | `"login"`            | `["login", "signup"]`                 |
+| `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`         | `["register", "checkout"]`            |
+| `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`            | `["error", "404"]`                    |
+
 ## ⚙️ Search Configuration Options
+
+The `search` and `async_search` functions has the following parameters that you can use to optimize your searches:
+
+| Parameter    | Type                   | Description                                                |
+| ------------ | ---------------------- | ---------------------------------------------------------- |
+| `query`      | `str`                  | The search query string.                                   |
+| `filters`    | `Filters \| None`      | Optional `Filters` object to narrow search results.        |
+| `mode`       | `'search'` \| `'news'` | Select between general web search or Google News results.  |
+| `count`      | `int`                  | Number of results to return (default: `10`).               |
+| `offset`     | `int`                  | Number of results to skip (use for pagination).            |
+| `unique`     | `bool`                 | If `True`, removes duplicate URLs across results.          |
+| `safe`       | `bool`                 | If `True`, uses Google SafeSearch (enabled by default).    |
+| `region`     | `str \| None`          | Optional two-letter region code (e.g., `'us'`, `'uk'`).    |
+| `proxy`      | `Proxy \| None`        | Optional `Proxy` object to route requests through a proxy. |
+| `sleep_time` | `int` or `float`       | Time in seconds to wait between requests (default: `0.5`). |
+
 
