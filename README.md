@@ -239,7 +239,7 @@ Here is a complete list of all the filters in SearchAI:
 
 ## ⚙️ Search Configuration Options
 
-The `search` and `async_search` functions has the following parameters that you can use to optimize your searches:
+The `search` and `async_search` functions have the following parameters that you can use to optimize your searches with:
 
 | Parameter    | Type                   | Description                                                | Default    |
 | ------------ | ---------------------- | ---------------------------------------------------------- | ---------- |
