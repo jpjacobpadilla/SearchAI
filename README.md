@@ -135,11 +135,13 @@ America’s Senate plans big changes for the House’s spending bill
 ### Markdown & JSON formats
 
 Once extracted, you can retrieve the results in either Markdown or JSON format for further processing.  
-If the `extend` argument is set to `True`, the content of the result's websites will also be included in the output.
-To achive this functionality, SearchAI uses [Playwright](https://github.com/microsoft/playwright) to load and extract content
-from websites.
 
-Getting results in markdown:
+If the `extend` argument is set to `True`, the content of the result's websites will also be included in the output.
+To achieve this functionality, SearchAI uses [Playwright](https://github.com/microsoft/playwright) to load and extract content
+from websites. In addition to extracting the main content of a page, SearchAI also tries to find metadata on pages, such as
+an author name and twitter handle.
+
+Getting results in markdown -- example output [here](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/markdown_example.py):
 
 ```python
 SearchResults.markdown(
@@ -151,7 +153,7 @@ SearchResults.markdown(
 )
 ```
 
-Getting results in json:
+Getting results in json -- example output [here](https://github.com/jpjacobpadilla/SearchAI/blob/c8c160a8d57e51ccb1c215ad27d652809a3d6da9/examples/json_example.py):
 
 ```python
 SearchResults.json(
@@ -162,11 +164,36 @@ SearchResults.json(
 )
 ```
 
-### JSON format
-
 ### Using proxies
 
+Google is very finicky about the IP address you use.  
+If you'd like to use proxies, you can create a proxy object using `Proxy` and pass it into either `search` or `async_search`.
+
+```python
+from search_ai import Proxy, search
+
+proxy = Proxy(
+    protocol="http, socks5, etc...",
+    host="host",
+    port=1000,
+    username="optional password",
+    password="optional username"
+)
+
+search('query', proxy=proxy)
+```
+
 ### Async support
+
+SearchAI also support Asyncio! Instead of using `search`, use `async_search`. The
+async version will return an `AsyncSearchResults` which will contain multiple instances of `AsyncSearchResult`.
+
+```python
+from search_ai import async_search
+
+results = await async_search(...)
+await results.json(extend=True)
+```
 
 ## 🧰 All filters
 
