@@ -1,14 +1,12 @@
 <p align="center">
-    <img src="https://github.com/jpjacobpadilla/SearchAI/blob/89e015df725990b3a3d9a35e6341b95a30ec1842/logo.png">
+    <img src="https://github.com/jpjacobpadilla/SearchAI/raw/554b788621d6667ca141ccdff07a128b863c1f92/logo.png">
 Google Search & News tool with advanced filters and LLM-friendly output formats!
 </p>
 
 
-✅ Search Google with **20+ powerful filters**  
-
-✅ Get results in **LLM-optimized Markdown** and **JSON** formats 
-
-✅ Built-in support for **asyncio, proxies, regional targeting**, and more!
+- Search Google with **20+ powerful filters**  
+- Get results in **LLM-optimized Markdown** and **JSON** formats 
+- Built-in support for **asyncio, proxies, regional targeting**, and more!
 
 ---
 
@@ -18,7 +16,7 @@ Google Search & News tool with advanced filters and LLM-friendly output formats!
 $ pip install search-ai-core
 ```
 
-## 🚀 Examples
+## Examples
 
 ### Basic search
 
@@ -195,7 +193,7 @@ results = await async_search(...)
 await results.json(extend=True)
 ```
 
-## 🧰 All filters
+## All filters
 
 You can narrow down searches by including filters like so:
 
@@ -237,7 +235,7 @@ Here is a complete list of all the filters in SearchAI:
 | `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`         | `["register", "checkout"]`            |
 | `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`            | `["error", "404"]`                    |
 
-## ⚙️ Search Configuration Options
+## Search Configuration Options
 
 The `search` and `async_search` functions have the following parameters that you can use to optimize your searches with:
 
