@@ -82,9 +82,85 @@ Python Institute - PROGRAM YOUR FUTURE
 
 ### Regional targeting
 
+```python
+from search_ai import search, regions
+
+results = search('Python', region=regions.JAPAN)
+
+for result in results:
+    print(result.title)
+```
+
+Output:
+
+```plaintext
+Welcome to Python.org
+python.jp: プログラミング言語 Python 総合情報サイト
+【入門】Pythonとは｜活用事例やメリット、できること、学習方法 ...
+ゼロからのPython入門講座 - python.jp
+Pythonの開発環境を用意しよう！（Windows） - Progate
+Python - Wikipedia
+プログラミング言語のPythonとは？その特徴と活用方法 - 発注ナビ
+Python試験・資格、データ分析試験・資格を運営する一般社団法人 ...
+Pythonの導入方法｜ソフトの利用方法 - 東京経済大学
+Pythonとは？開発に役立つ使い方、トレンド記事やtips - Qiita
+```
+
 ### Search news
 
-### Markdown format
+```python
+from search_ai import search
+
+results = search('United States', mode='news')
+
+for result in results:
+    print(result.title)
+```
+
+Output:
+
+```plaintext
+Trump’s foreign policy is not so unusual for the US – he just drops the facade of moral leadership
+'I didn’t vote for him': How American tourists are navigating global perceptions
+The ‘quiet’ crisis brewing between the US and South Korea
+Kremlin calls Trump 'emotional' after US president says Putin is 'crazy'
+What’s Trump’s Vision on China, Russia and the World?
+Canada welcomes King Charles against a backdrop of tensions with Trump
+Memorial Day storms cause travel delays as millions prepare to head home
+U.S. economy will be growing faster than 3% this time next year, predicts Treasury’s Bessent
+E.U. says it will fast-track tariff talks with U.S. after Trump threats
+America’s Senate plans big changes for the House’s spending bill
+```
+
+### Markdown & JSON formats
+
+Once extracted, you can retrieve the results in either Markdown or JSON format for further processing.  
+If the `extend` argument is set to `True`, the content of the result's websites will also be included in the output.
+To achive this functionality, SearchAI uses [Playwright](https://github.com/microsoft/playwright) to load and extract content
+from websites.
+
+Getting results in markdown:
+
+```python
+SearchResults.markdown(
+    extend=False,           # Set to True to fetch and include page content
+    content_length=1000,    # Limit the length of extracted content
+    ignore_links=False,     # Exclude hyperlinks in the content
+    ignore_images=True,     # Exclude images from the content
+    only_page_content=False # If True, omits metadata from the output
+)
+```
+
+Getting results in json:
+
+```python
+SearchResults.json(
+    extend=False,           # Set to True to fetch and include page content
+    content_length=1000,    # Limit the length of extracted content
+    ignore_links=False,     # Exclude hyperlinks in the content
+    ignore_images=True,     # Exclude images from the content
+)
+```
 
 ### JSON format
 
