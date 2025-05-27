@@ -151,7 +151,7 @@ class SearchResults(list):
         super().__init__(results)
         self._proxy = _proxy
 
-    def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
+    def markdown(self, extend: bool = False, content_length: int = 1_000, **kwargs) -> str:
         if not self:  # Edge case for no search results
             return ''
 
@@ -167,7 +167,7 @@ class SearchResults(list):
 
         return '# Search Results\n\n' + '\n----------\n'.join(content)
 
-    def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
+    def json(self, extend: bool = False, content_length: int = 1_000, **kwargs) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
 
@@ -183,7 +183,7 @@ class AsyncSearchResults(list):
         super().__init__(results)
         self._proxy = _proxy
 
-    async def markdown(self, extend: bool = False, content_length: int = 400, **kwargs) -> str:
+    async def markdown(self, extend: bool = False, content_length: int = 1_000, **kwargs) -> str:
         if not extend:
             content = [result._basic_markdown() for result in self]
 
@@ -196,7 +196,7 @@ class AsyncSearchResults(list):
 
         return '# Search Results\n\n' + '\n----------\n'.join(content)
 
-    async def json(self, extend: bool = False, content_length: int = 400, **kwargs) -> list[dict]:
+    async def json(self, extend: bool = False, content_length: int = 1_000, **kwargs) -> list[dict]:
         if not extend:
             return [result.model_dump() for result in self]
 
