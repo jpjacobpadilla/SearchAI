@@ -4,7 +4,7 @@ Google Search & News tool with advanced filters and LLM-friendly output formats!
 </p>
 
 
-✅ Search google with **20+ powerful filters**  
+✅ Search Google with **20+ powerful filters**  
 
 ✅ Get results in **LLM-optimized Markdown** and **JSON** formats 
 
@@ -214,17 +214,17 @@ Filters(
 Here is a complete list of all the filters in SearchAI:
 
 | Filter                  | Description                                                             | Example (str)        | Example (list)                        |
-| ----------------------- | ----------------------------------------------------------------------- | -------------------- | ------------------------------------- |
+| ----------------------- | ----------------------------------------------------------------------- | -------------------- |---------------------------------------|
 | `sites`                 | Only show results from specific domains                                 | `"example.com"`      | `["example.com", "another.com"]`      |
 | `tlds`                  | Only show results from specific top-level domains (e.g. `.gov`, `.edu`) | `".edu"`             | `[".edu", ".gov"]`                    |
-| `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`              | *N/A*                                 |
-| `https_only`            | Only show websites that support HTTPS                                   | `True`               | *N/A*                                 |
+| `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`              |                                       |
+| `https_only`            | Only show websites that support HTTPS                                   | `True`               |                                       |
 | `exclude_sites`         | Exclude results from specific domains                                   | `"facebook.com"`     | `["facebook.com", "twitter.com"]`     |
 | `exclude_tlds`          | Exclude results from specific top-level domains                         | `".xyz"`             | `[".xyz", ".ru"]`                     |
 | `exclude_filetypes`     | Exclude documents with specific file types                              | `"doc"`              | `["doc", "xls"]`                      |
-| `exclude_https`         | Exclude HTTPS pages                                                     | `True`               | *N/A*                                 |
-| `before`                | Only show results before this date                                      | `date(2022, 12, 31)` | *N/A*                                 |
-| `after`                 | Only show results after this date                                       | `date(2023, 1, 1)`   | *N/A*                                 |
+| `exclude_https`         | Exclude HTTPS pages                                                     | `True`               |                                       |
+| `before`                | Only show results before this date                                      | `date(2022, 12, 31)` |                                       |
+| `after`                 | Only show results after this date                                       | `date(2023, 1, 1)`   |                                       |
 | `any_keywords`          | Require at least one word anywhere in the page                          | `"python"`           | `["python", "django"]`                |
 | `all_keywords`          | Require all of these words somewhere in the page                        | `"ai"`               | `["ai", "ml", "nlp"]`                 |
 | `exact_phrases`         | Include results with exact phrases                                      | `"machine learning"` | `["deep learning", "language model"]` |
@@ -241,17 +241,16 @@ Here is a complete list of all the filters in SearchAI:
 
 The `search` and `async_search` functions has the following parameters that you can use to optimize your searches:
 
-| Parameter    | Type                   | Description                                                |
-| ------------ | ---------------------- | ---------------------------------------------------------- |
-| `query`      | `str`                  | The search query string.                                   |
-| `filters`    | `Filters \| None`      | Optional `Filters` object to narrow search results.        |
-| `mode`       | `'search'` \| `'news'` | Select between general web search or Google News results.  |
-| `count`      | `int`                  | Number of results to return (default: `10`).               |
-| `offset`     | `int`                  | Number of results to skip (use for pagination).            |
-| `unique`     | `bool`                 | If `True`, removes duplicate URLs across results.          |
-| `safe`       | `bool`                 | If `True`, uses Google SafeSearch (enabled by default).    |
-| `region`     | `str \| None`          | Optional two-letter region code (e.g., `'us'`, `'uk'`).    |
-| `proxy`      | `Proxy \| None`        | Optional `Proxy` object to route requests through a proxy. |
-| `sleep_time` | `int` or `float`       | Time in seconds to wait between requests (default: `0.5`). |
-
+| Parameter    | Type                   | Description                                                | Default    |
+| ------------ | ---------------------- | ---------------------------------------------------------- | ---------- |
+| `query`      | `str`                  | The search query string.                                   | `""`       |
+| `filters`    | `Filters \| None`      | Optional `Filters` object to narrow search results.        | `None`     |
+| `mode`       | `'search'` \| `'news'` | Select between general web search or Google News results.  | `"search"` |
+| `count`      | `int`                  | Number of results to return.                               | `10`       |
+| `offset`     | `int`                  | Number of results to skip at the beginning.                | `0`        |
+| `unique`     | `bool`                 | If `True`, removes duplicate URLs across results.          | `False`    |
+| `safe`       | `bool`                 | If `True`, uses Google SafeSearch.                         | `True`     |
+| `region`     | `str \| None`          | Suggested region for search results.                       | `None`     |
+| `proxy`      | `Proxy \| None`        | Optional `Proxy` object to route requests through a proxy. | `None`     |
+| `sleep_time` | `int` or `float`       | Time in seconds to wait between requests.                  | `0.5`      |
 
