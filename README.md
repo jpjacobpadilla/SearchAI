@@ -1,6 +1,5 @@
-<img src="https://github.com/jpjacobpadilla/SearchAI/raw/e4757d774d0a76e16c2c7a34ee6f334a8a771a91/logo2.png" width="0px">
 <p align="center">
-    <img src="https://github.com/jpjacobpadilla/SearchAI/raw/554b788621d6667ca141ccdff07a128b863c1f92/logo.png">
+    <img src="https://github.com/jpjacobpadilla/SearchAI/raw/381e4e9c369ee1f73fa945e68e1a09ce39289196/searchai.png">
 Google Search & News tool with advanced filters and LLM-friendly output formats!
 </p>
 
