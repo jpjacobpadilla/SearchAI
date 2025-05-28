@@ -1,8 +1,8 @@
+<img src="https://github.com/jpjacobpadilla/SearchAI/raw/e4757d774d0a76e16c2c7a34ee6f334a8a771a91/logo2.png" width="0px">
 <p align="center">
     <img src="https://github.com/jpjacobpadilla/SearchAI/raw/554b788621d6667ca141ccdff07a128b863c1f92/logo.png">
 Google Search & News tool with advanced filters and LLM-friendly output formats!
 </p>
-
 
 - Search Google with **20+ powerful filters**  
 - Get results in **LLM-optimized Markdown** and **JSON** formats 
