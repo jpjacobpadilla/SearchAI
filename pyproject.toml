@@ -11,7 +11,7 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 urls = { "Homepage" = "https://github.com/jpjacobpadilla/SearchAI" }
 authors = [
-    { name = "Jacob Padilla", email = "searchai@jacobpadilla.com" }
+    { name = "Jacob Padilla" }
 ]
 keywords = [
     "python", "search", "markdown", "search-engine",
