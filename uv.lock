@@ -1726,8 +1726,8 @@ wheels = [
 ]
 
 [[package]]
-name = "searchai"
-version = "0.1.0"
+name = "search-ai-core"
+version = "1.0.0"
 source = { editable = "." }
 dependencies = [
     { name = "html2text" },

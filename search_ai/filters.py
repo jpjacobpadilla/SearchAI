@@ -8,6 +8,7 @@ from publicsuffix2 import PublicSuffixList
 
 FileType = Annotated[str, StringConstraints(pattern=r'^[a-zA-Z0-9]{2,10}$')]
 Keyword = Annotated[str, StringConstraints(pattern=r'^[^\s]+$')]
+StockTicker = Annotated[str, StringConstraints(pattern=r'^[A-Z]{1,5}(\.[A-Z])?$')]
 
 psl = PublicSuffixList()
 
@@ -56,6 +57,7 @@ class Filters(BaseModel):
     tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Only show results from specific top-level domains (e.g., .gov, .edu)')
     filetype: FileType | None = Field(None, description='Only show documents that are a specific file type. Note: Google only supports one filetype per search.')
     https_only: bool = Field(False, description='Only show websites that support HTTPS')
+    stock: StockTicker | None = Field(None, description='Get results for a specific stock ticker')
 
     exclude_sites: str | list[str] | None = Field(None, description='Exclude results from specific domains')
     exclude_tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Exclude results from specific top-level domains')
@@ -86,6 +88,7 @@ class Filters(BaseModel):
 
         filters.append(group_includes(to_list(self.sites), 'site'))
         filters.append(group_includes(to_list(self.tlds), 'site'))
+        filters.append(group_includes(to_list(self.stock), 'stock'))
 
         filters.append(group_includes(to_list(self.filetype), 'filetype'))
         filters.append(group_includes(to_list(self.any_keywords)))

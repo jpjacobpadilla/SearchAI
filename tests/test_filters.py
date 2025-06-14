@@ -52,6 +52,8 @@ from search_ai import Filters
         ('not_in_url', ['ref', 'share'], '-inurl:ref -inurl:share'),
         ('not_in_text', 'cookie', '-intext:cookie'),
         ('not_in_text', ['ads', 'popup'], '-intext:ads -intext:popup'),
+        ('stock', 'TSLA', 'stock:TSLA'),
+        ('stock', 'BRK.A', 'stock:BRK.A'),
     ],
 )
 def test_individual_fields(field, value, expected):
@@ -77,6 +79,9 @@ def test_individual_fields(field, value, expected):
         ('tlds', ['.edu', '.badzone']),
         ('exclude_tlds', '.invalidtld'),
         ('exclude_tlds', ['.edu', '.badzone']),
+        ('stock', 'U.S. Energy'),
+        ('stock', 'HOOOOD'),
+        ('stock', ['NET']),
     ],
 )
 def test_field_validation(field, value):
@@ -155,6 +160,14 @@ def test_field_validation(field, value):
                 'not_in_title': 'sponsored',
             },
             '"deep learning" intitle:tutorial -"deprecated method" -intitle:sponsored',
+        ),
+        (
+            {
+                'in_title': 'earnings',
+                'stock': 'ORCL',
+                'sites': ['finance.yahoo.com', 'reuters.com'],
+            },
+            '(site:finance.yahoo.com | site:reuters.com) stock:ORCL intitle:earnings',
         ),
     ],
 )

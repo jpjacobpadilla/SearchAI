@@ -211,7 +211,7 @@ Filters(
 Here is a complete list of all the filters in SearchAI:
 
 | Filter                  | Description                                                             | Example (str)        | Example (list)                        |
-| ----------------------- | ----------------------------------------------------------------------- | -------------------- |---------------------------------------|
+|-------------------------|-------------------------------------------------------------------------|----------------------|---------------------------------------|
 | `sites`                 | Only show results from specific domains                                 | `"example.com"`      | `["example.com", "another.com"]`      |
 | `tlds`                  | Only show results from specific top-level domains (e.g. `.gov`, `.edu`) | `".edu"`             | `[".edu", ".gov"]`                    |
 | `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`              |                                       |
@@ -233,6 +233,7 @@ Here is a complete list of all the filters in SearchAI:
 | `not_in_title`          | Exclude pages with specific words in the title                          | `"login"`            | `["login", "signup"]`                 |
 | `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`         | `["register", "checkout"]`            |
 | `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`            | `["error", "404"]`                    |
+| `stock`                 | Search specifically for a specific stock (via a ticker)                 | `"TSLA"`             |                                       |
 
 ## Search Configuration Options
 
