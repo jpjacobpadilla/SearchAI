@@ -233,7 +233,7 @@ Here is a complete list of all the filters in SearchAI:
 | `not_in_title`          | Exclude pages with specific words in the title                          | `"login"`            | `["login", "signup"]`                 |
 | `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`         | `["register", "checkout"]`            |
 | `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`            | `["error", "404"]`                    |
-| `stock`                 | Search specifically for a specific stock (via a ticker)                 | `"TSLA"`             |                                       |
+| `stock`                 | Search for a specific stock via its ticker                              | `"TSLA"`             |                                       |
 
 ## Search Configuration Options
 
