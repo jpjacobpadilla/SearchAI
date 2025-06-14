@@ -1,6 +1,13 @@
+from datetime import date
 from search_ai import search, Filters
 
-search_filters = Filters(stock='ORCL', in_title='earnings')
+
+search_filters = Filters(
+    stock='ORCL',
+    in_title='earnings',
+    after=date(year=2025, month=6, day=10)
+)
+
 results = search(mode='news', filters=search_filters, count=8)
 
 for result in results:
@@ -9,10 +16,9 @@ for result in results:
 """
 Oracle stock touches all-time high after earnings beat
 Oracle Stock (ORCL) Is About to Report Q4 Earnings Tomorrow. Here Is What to Expect
-How Will Oracle Stock React To Its Upcoming Earnings?
 Oracle Announces Fiscal 2025 Fourth Quarter and Fiscal Full Year Financial Results
 Oracle Earnings and Chip Demand
-Earnings week ahead: ADBE, ORCL, GME, GTLB, CHWY, and more (NASDAQ:ADBE)
 Oracle stock touches all-time high after earnings beat
-Oracle Stock Falls On Earnings, Sales Miss. Tech Giant Touts Strong AI Demand.
+Transcript : Oracle Corporation, Q4 2025 Earnings Call, Jun 11, 2025
+Oracle (ORCL) Stock Hits All-Time Highs After Earnings, Now Valued at $560 Billion: Crypto Market Implications
 """
