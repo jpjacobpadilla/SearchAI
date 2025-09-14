@@ -1,44 +1,25 @@
 from lxml import html
-from urllib.parse import urlparse, parse_qs
 
 
-RESULTS_XPATH = './/div[@class="ezO2md"][descendant::*[contains(@class, "fuLhoc")]]'
-TITLE_XPATH = './/*[contains(@class, "fuLhoc")]'
-SUB_TITLE_XPATH = './span[1]'
-LINK_XPATH = './/a'
-DESCRIPTION_XPATH = './/span[contains(@class, "FrIlee")]//span[@class="fYyStc" and normalize-space()]'
+LINK_TITLE_XPATH = '//a[@class="result-link" and not(ancestor::tr[@class="result-sponsored"])]'
+DESCRIPTION_XPATH = '//td[@class="result-snippet" and not(ancestor::tr[@class="result-sponsored"])]'
 
 
 def parse_search(data):
     result_set = []
 
     tree = html.fromstring(data)
-    results = tree.xpath(RESULTS_XPATH)
 
-    for result in results:
-        title_elem = result.xpath(TITLE_XPATH)
-        if not title_elem:
-            continue
+    title_results = tree.xpath(LINK_TITLE_XPATH)
+    desc_results = tree.xpath(DESCRIPTION_XPATH)
 
-        title_elem = title_elem[0]
-        if title := title_elem.xpath(SUB_TITLE_XPATH):
-            extracted_title = title[0].text
-        else:
-            extracted_title = title_elem.text
+    assert len(title_results) == len(desc_results), 'Error parsing search results'
 
-        link_elem = result.xpath(LINK_XPATH)[0].attrib['href']
-        link = parse_qs(urlparse(link_elem).query).get('q')
-        if not link:
-            continue
-
-        extracted_link = link[0].strip()
-
-        description_elem = result.xpath(DESCRIPTION_XPATH)
-        if description_elem:
-            extracted_description = description_elem[0].text_content().strip()
-        else:
-            extracted_description = None
-
-        result_set.append({'title': extracted_title, 'link': extracted_link, 'description': extracted_description})
+    for title, desc in zip(title_results, desc_results):
+        result_set.append({
+            'title': title.text_content().strip(),
+            'link':  title.get('href'),
+            'description':  desc.text_content().strip()
+        })
 
     return result_set
