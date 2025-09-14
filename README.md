@@ -70,9 +70,11 @@ Python Institute - PROGRAM YOUR FUTURE
 ### Regional targeting
 
 ```python
-from search_ai import search, Regions
+from search_ai import search, Filters, Regions
 
-results = search('Python', region=Regions.JAPAN)
+search_filters = Filters(region=Regions.JAPAN)
+
+results = search('Python', filters=search_filters)
 
 for result in results:
     print(result.title)
@@ -127,7 +129,6 @@ SearchResults.json(
 
 ### Using proxies
 
-Google is very finicky about the IP address you use.  
 If you'd like to use proxies, you can create a proxy object using `Proxy` and pass it into either `search` or `async_search`.
 
 ```python
@@ -173,31 +174,29 @@ Filters(
 
 Here is a complete list of all the filters in SearchAI:
 
-Here is a complete list of all the filters in SearchAI:
-
-| Filter                  | Description                                                             | Example (str)        | Example (list)                        |
-|-------------------------|-------------------------------------------------------------------------|----------------------|---------------------------------------|
-| `region`                | Only show results from specific regions                                 | `Regions.US_ENGLISH` |                                       |
+| Filter                  | Description                                                             | Example (one)         | Example (many)                        |
+|-------------------------|-------------------------------------------------------------------------|-----------------------|---------------------------------------|
+| `region`                | Only show results from specific regions                                 | `Regions.US_ENGLISH`  |                                       |
 | `time_span`             | Timespan for the search                                                 | `Timespans.PAST_WEEK` |                                       |
-| `sites`                 | Only show results from specific domains                                 | `"example.com"`      | `["example.com", "another.com"]`      |
-| `tlds`                  | Only show results from specific top-level domains (e.g. `.gov`, `.edu`) | `".edu"`             | `[".edu", ".gov"]`                    |
-| `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`              |                                       |
-| `https_only`            | Only show websites that support HTTPS                                   | `True`               |                                       |
-| `exclude_sites`         | Exclude results from specific domains                                   | `"facebook.com"`     | `["facebook.com", "twitter.com"]`     |
-| `exclude_tlds`          | Exclude results from specific top-level domains                         | `".xyz"`             | `[".xyz", ".ru"]`                     |
-| `exclude_filetypes`     | Exclude documents with specific file types                              | `"doc"`              | `["doc", "xls"]`                      |
-| `exclude_https`         | Exclude HTTPS pages                                                     | `True`               |                                       |
-| `any_keywords`          | Require at least one word anywhere in the page                          | `"python"`           | `["python", "django"]`                |
-| `all_keywords`          | Require all of these words somewhere in the page                        | `"ai"`               | `["ai", "ml", "nlp"]`                 |
-| `exact_phrases`         | Include results with exact phrases                                      | `"machine learning"` | `["deep learning", "language model"]` |
-| `exclude_all_keywords`  | Exclude pages containing certain words                                  | `"ads"`              | `["ads", "tracking"]`                 |
-| `exclude_exact_phrases` | Exclude results with exact phrases                                      | `"click here"`       | `["click here", "buy now"]`           |
-| `in_title`              | Require specific words in the title                                     | `"resume"`           | `["resume", "portfolio"]`             |
-| `in_url`                | Require specific words in the URL                                       | `"blog"`             | `["blog", "tutorial"]`                |
-| `in_text`               | Require specific words in the page text                                 | `"case study"`       | `["case study", "example"]`           |
-| `not_in_title`          | Exclude pages with specific words in the title                          | `"login"`            | `["login", "signup"]`                 |
-| `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`         | `["register", "checkout"]`            |
-| `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`            | `["error", "404"]`                    |
+| `sites`                 | Only show results from specific domains                                 | `"example.com"`       | `["example.com", "another.com"]`      |
+| `tlds`                  | Only show results from specific top-level domains (e.g. `.gov`, `.edu`) | `".edu"`              | `[".edu", ".gov"]`                    |
+| `filetype`              | Only show documents of a specific file type (only one allowed)          | `"pdf"`               |                                       |
+| `https_only`            | Only show websites that support HTTPS                                   | `True`                |                                       |
+| `exclude_sites`         | Exclude results from specific domains                                   | `"facebook.com"`      | `["facebook.com", "twitter.com"]`     |
+| `exclude_tlds`          | Exclude results from specific top-level domains                         | `".xyz"`              | `[".xyz", ".ru"]`                     |
+| `exclude_filetypes`     | Exclude documents with specific file types                              | `"doc"`               | `["doc", "xls"]`                      |
+| `exclude_https`         | Exclude HTTPS pages                                                     | `True`                |                                       |
+| `any_keywords`          | Require at least one word anywhere in the page                          | `"python"`            | `["python", "django"]`                |
+| `all_keywords`          | Require all of these words somewhere in the page                        | `"ai"`                | `["ai", "ml", "nlp"]`                 |
+| `exact_phrases`         | Include results with exact phrases                                      | `"machine learning"`  | `["deep learning", "language model"]` |
+| `exclude_all_keywords`  | Exclude pages containing certain words                                  | `"ads"`               | `["ads", "tracking"]`                 |
+| `exclude_exact_phrases` | Exclude results with exact phrases                                      | `"click here"`        | `["click here", "buy now"]`           |
+| `in_title`              | Require specific words in the title                                     | `"resume"`            | `["resume", "portfolio"]`             |
+| `in_url`                | Require specific words in the URL                                       | `"blog"`              | `["blog", "tutorial"]`                |
+| `in_text`               | Require specific words in the page text                                 | `"case study"`        | `["case study", "example"]`           |
+| `not_in_title`          | Exclude pages with specific words in the title                          | `"login"`             | `["login", "signup"]`                 |
+| `not_in_url`            | Exclude pages with specific words in the URL                            | `"register"`          | `["register", "checkout"]`            |
+| `not_in_text`           | Exclude pages with specific words in the page text                      | `"error"`             | `["error", "404"]`                    |
 
 ## Search Configuration Options
 
