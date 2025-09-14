@@ -1,5 +1,4 @@
 from enum import Enum
-from datetime import date
 from typing import Annotated
 
 from pydantic import BaseModel, Field, AfterValidator
@@ -176,11 +175,6 @@ class Filters(BaseModel):
         filters.extend([f'intitle:{w}' for w in to_list(self.in_title)])
         filters.extend([f'inurl:{w}' for w in to_list(self.in_url)])
         filters.extend([f'intext:{w}' for w in to_list(self.in_text)])
-
-        if self.before:
-            filters.append(f'before:{self.before.isoformat()}')
-        if self.after:
-            filters.append(f'after:{self.after.isoformat()}')
 
         # Negative Filters
         if self.exclude_exact_phrases:
