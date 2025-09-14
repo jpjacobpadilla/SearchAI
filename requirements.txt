@@ -2,26 +2,16 @@
 #    uv pip compile pyproject.toml -o requirements.txt
 annotated-types==0.7.0
     # via pydantic
-anyio==4.9.0
-    # via httpx
 certifi==2025.4.26
-    # via
-    #   httpcore
-    #   httpx
+    # via curl-cffi
+cffi==1.17.1
+    # via curl-cffi
+curl-cffi==0.13.0
+    # via search-ai-core (pyproject.toml)
 greenlet==3.2.2
     # via playwright
-h11==0.16.0
-    # via httpcore
 html2text==2025.4.15
     # via search-ai-core (pyproject.toml)
-httpcore==1.0.9
-    # via httpx
-httpx==0.28.1
-    # via search-ai-core (pyproject.toml)
-idna==3.10
-    # via
-    #   anyio
-    #   httpx
 lxml==5.4.0
     # via search-ai-core (pyproject.toml)
 nest-asyncio==1.6.0
@@ -30,21 +20,18 @@ playwright==1.52.0
     # via search-ai-core (pyproject.toml)
 publicsuffix2==2.20191221
     # via search-ai-core (pyproject.toml)
+pycparser==2.22
+    # via cffi
 pydantic==2.11.5
     # via search-ai-core (pyproject.toml)
 pydantic-core==2.33.2
     # via pydantic
 pyee==13.0.0
     # via playwright
-sniffio==1.3.1
-    # via anyio
-socksio==1.0.0
-    # via httpx
 tenacity==9.1.2
     # via search-ai-core (pyproject.toml)
 typing-extensions==4.13.2
     # via
-    #   anyio
     #   pydantic
     #   pydantic-core
     #   pyee
