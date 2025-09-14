@@ -1,3 +1,4 @@
+from enum import Enum
 from datetime import date
 from typing import Annotated
 
@@ -6,9 +7,81 @@ from pydantic.types import StringConstraints
 from publicsuffix2 import PublicSuffixList
 
 
+class Regions(str, Enum):
+    ARGENTINA = "ar-es"
+    AUSTRALIA = "au-en"
+    AUSTRIA = "at-de"
+    BELGIUM_FR = "be-fr"
+    BELGIUM_NL = "be-nl"
+    BRAZIL = "br-pt"
+    BULGARIA = "bg-bg"
+    CANADA_EN = "ca-en"
+    CANADA_FR = "ca-fr"
+    CATALONIA = "ct-ca"
+    CHILE = "cl-es"
+    CHINA = "cn-zh"
+    COLOMBIA = "co-es"
+    CROATIA = "hr-hr"
+    CZECH_REPUBLIC = "cz-cs"
+    DENMARK = "dk-da"
+    ESTONIA = "ee-et"
+    FINLAND = "fi-fi"
+    FRANCE = "fr-fr"
+    GERMANY = "de-de"
+    GREECE = "gr-el"
+    HONG_KONG = "hk-tzh"
+    HUNGARY = "hu-hu"
+    ICELAND = "is-is"
+    INDIA_EN = "in-en"
+    INDONESIA_EN = "id-en"
+    IRELAND = "ie-en"
+    ISRAEL_EN = "il-en"
+    ITALY = "it-it"
+    JAPAN = "jp-jp"
+    KOREA = "kr-kr"
+    LATVIA = "lv-lv"
+    LITHUANIA = "lt-lt"
+    MALAYSIA_EN = "my-en"
+    MEXICO = "mx-es"
+    NETHERLANDS = "nl-nl"
+    NEW_ZEALAND = "nz-en"
+    NORWAY = "no-no"
+    PAKISTAN_EN = "pk-en"
+    PERU = "pe-es"
+    PHILIPPINES_EN = "ph-en"
+    POLAND = "pl-pl"
+    PORTUGAL = "pt-pt"
+    ROMANIA = "ro-ro"
+    RUSSIA = "ru-ru"
+    SAUDI_ARABIA = "xa-ar"
+    SINGAPORE = "sg-en"
+    SLOVAKIA = "sk-sk"
+    SLOVENIA = "sl-sl"
+    SOUTH_AFRICA = "za-en"
+    SPAIN_CA = "es-ca"
+    SPAIN_ES = "es-es"
+    SWEDEN = "se-sv"
+    SWITZERLAND_DE = "ch-de"
+    SWITZERLAND_FR = "ch-fr"
+    TAIWAN = "tw-tzh"
+    THAILAND_EN = "th-en"
+    TURKEY = "tr-tr"
+    US_ENGLISH = "us-en"
+    US_SPANISH = "us-es"
+    UKRAINE = "ua-uk"
+    UNITED_KINGDOM = "uk-en"
+    VIETNAM_EN = "vn-en"
+
+
+class Timespans(str, Enum):
+    PAST_DAY = 'd'
+    PAST_WEEK = 'w'
+    PAST_MONTH = 'm'
+    PAST_YEAR = 'y'
+
+
 FileType = Annotated[str, StringConstraints(pattern=r'^[a-zA-Z0-9]{2,10}$')]
 Keyword = Annotated[str, StringConstraints(pattern=r'^[^\s]+$')]
-StockTicker = Annotated[str, StringConstraints(pattern=r'^[A-Z]{1,5}(\.[A-Z])?$')]
 
 psl = PublicSuffixList()
 
@@ -53,19 +126,19 @@ def validate_tld(v: str | list[str] | None):
 
 class Filters(BaseModel):
     # fmt: off
-    sites: str | list[str] | None = Field(None, description='Only show results from specific domains')
+    region: Regions | None = Field(None, description ='Only show results from specific regions')
+    time_span: Timespans | None = Field(None, description='Timespan for the search')
+    safe_search: bool = Field(False, description='Toggle safe search feature')
+
     tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Only show results from specific top-level domains (e.g., .gov, .edu)')
+    sites: str | list[str] | None = Field(None, description='Only show results from specific domains')
     filetype: FileType | None = Field(None, description='Only show documents that are a specific file type. Note: Google only supports one filetype per search.')
     https_only: bool = Field(False, description='Only show websites that support HTTPS')
-    stock: StockTicker | None = Field(None, description='Get results for a specific stock ticker')
 
-    exclude_sites: str | list[str] | None = Field(None, description='Exclude results from specific domains')
     exclude_tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Exclude results from specific top-level domains')
+    exclude_sites: str | list[str] | None = Field(None, description='Exclude results from specific domains')
     exclude_filetypes: FileType | list[FileType] | None = Field(None, description='Exclude documents with specific file types')
     exclude_https: bool = Field(False, description='Exclude HTTPS pages')
-
-    before: date | None = Field(None, description='Only show results before this date')
-    after: date | None = Field(None, description='Only show results after this date')
 
     any_keywords: Keyword | list[Keyword] | None = Field(None, description='Require at least one word anywhere in the page')
     all_keywords: Keyword | list[Keyword] | None = Field(None, description='Require specific words anywhere in the page')
@@ -131,5 +204,8 @@ class Filters(BaseModel):
         filters.extend([f'-inurl:{w}' for w in to_list(self.not_in_url)])
         filters.extend([f'-intitle:{w}' for w in to_list(self.not_in_title)])
         filters.extend([f'-intext:{w}' for w in to_list(self.not_in_text)])
+
+        if self.safe_search:
+            filters.append('!safeon')
 
         return ' '.join([f for f in filters if f])
