@@ -106,9 +106,9 @@ def _request(
 
     if filters:
         if filters.time_span:
-            data['df'] = filters.time_span
+            data['df'] = filters.time_span.value
         if filters.region:
-            data['kl'] = filters.region
+            data['kl'] = filters.region.value
 
     with curl.Session(proxy=proxy.to_httpx_proxy_url() if proxy else None) as session:
         resp = session.post(BASE_URL, data=data, headers=HEADERS)
@@ -133,9 +133,9 @@ async def _async_request(
 
     if filters:
         if filters.time_span:
-            data['df'] = filters.time_span
+            data['df'] = filters.time_span.value
         if filters.region:
-            data['kl'] = filters.region
+            data['kl'] = filters.region.value
 
     async with curl.AsyncSession(proxy=proxy.to_httpx_proxy_url() if proxy else None) as session:
         resp = await session.post(BASE_URL, data=data, headers=HEADERS)

@@ -6,7 +6,7 @@ DESCRIPTION_XPATH = '//td[@class="result-snippet" and not(ancestor::tr[@class="r
 
 
 def parse_search(data):
-    result_set = []
+    results = []
 
     tree = html.fromstring(data)
 
@@ -16,10 +16,10 @@ def parse_search(data):
     assert len(title_results) == len(desc_results), 'Error parsing search results'
 
     for title, desc in zip(title_results, desc_results):
-        result_set.append({
+        results.append({
             'title': title.text_content().strip(),
             'link':  title.get('href'),
             'description':  desc.text_content().strip()
         })
 
-    return result_set
+    return results

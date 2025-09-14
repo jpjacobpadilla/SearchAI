@@ -127,7 +127,6 @@ class Filters(BaseModel):
     # fmt: off
     region: Regions | None = Field(None, description ='Only show results from specific regions')
     time_span: Timespans | None = Field(None, description='Timespan for the search')
-    safe_search: bool = Field(False, description='Toggle safe search feature')
 
     tlds: Annotated[str | list[str] | None, AfterValidator(validate_tld)] = Field(None, description='Only show results from specific top-level domains (e.g., .gov, .edu)')
     sites: str | list[str] | None = Field(None, description='Only show results from specific domains')
@@ -197,8 +196,5 @@ class Filters(BaseModel):
         filters.extend([f'-inurl:{w}' for w in to_list(self.not_in_url)])
         filters.extend([f'-intitle:{w}' for w in to_list(self.not_in_title)])
         filters.extend([f'-intext:{w}' for w in to_list(self.not_in_text)])
-
-        if self.safe_search:
-            filters.append('!safeon')
 
         return ' '.join([f for f in filters if f])
