@@ -15,8 +15,7 @@ authors = [
 ]
 keywords = [
     "python", "search", "markdown", "search-engine",
-    "data", "google", "ai", "web-crawler", "googlesearch",
-    "googlenews", "llm"
+    "data", "ai", "web-crawler", "llm"
 ]
 dependencies = [
     "curl-cffi>=0.13.0",
