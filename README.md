@@ -6,7 +6,7 @@ Search the web with advanced filters and LLM-friendly output formats!
 ```python
 from search_ai import search
 
-results = search('Best LLM')
+results = search('What is the best LLM in 2025?')
 
 for result in results:
     print(result.title)
@@ -15,16 +15,16 @@ for result in results:
 Output:
 
 ```plaintext
-LLM Leaderboard 2025 - Vellum AI
-What is your favorite LLM right now? : r/singularity - Reddit
-Top 9 Large Language Models as of May 2025 | Shakudo
-The best large language models (LLMs) in 2025 - Zapier
-LLM Rankings - OpenRouter
-Best LLM Benchmarks for code? - Cursor - Community Forum
-Best Small LLM For Rag - Models - Hugging Face Forums
-LLM Leaderboard - Compare GPT-4o, Llama 3, Mistral, Gemini ...
-25 of the best large language models in 2025 - TechTarget
-The Best LLM Is.... (A breakdown for every category) - YouTube
+LLM Leaderboard 2025 - Verified AI Rankings
+Best LLM Models 2025: Top 10 AI Models Ranked & Compared
+Top 7 LLMs Ranked in 2025: GPT-4o, Gemini, Claude & More
+10 Best Large Language Models (LLMs) in 2025 - Beebom
+Best Large Language Models (LLMs) of 2025 - TechRadar
+Top 9 Large Language Models as of September 2025 | Shakudo
+Top 15 LLMs in 2025: Best Large Language Models
+Top LLMs in 2025: Comparing Claude, Gemini, and GPT-4 LLaMA
+Best LLM Models 2025 - Complete Guide to Top 7 AI Language Models
+15 Best LLM Models in 2025 | Top AI Language Models Ranked
 ```
 
 ### Install
