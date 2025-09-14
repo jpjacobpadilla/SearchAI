@@ -17,10 +17,7 @@ from .search_result import SearchResult, SearchResults, AsyncSearchResult, Async
 BASE_URL = 'https://lite.duckduckgo.com/lite/'
 SLEEP_TIME = 0.25
 
-HEADERS = {
-    "origin": "https://lite.duckduckgo.com",
-    "referer": "https://lite.duckduckgo.com/"
-}
+HEADERS = {'origin': 'https://lite.duckduckgo.com', 'referer': 'https://lite.duckduckgo.com/'}
 
 retry_curl = partial(
     retry,
@@ -96,9 +93,7 @@ def _request(
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {
-        'q': query + (filters.compile_filters() if filters else '')
-    }
+    data: dict[str, Any] = {'q': query + (filters.compile_filters() if filters else '')}
 
     if offset:
         data['s'] = offset - 1
@@ -123,9 +118,7 @@ async def _async_request(
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {
-        'q': query + (filters.compile_filters() if filters else '')
-    }
+    data: dict[str, Any] = {'q': query + (filters.compile_filters() if filters else '')}
 
     if offset:
         data['s'] = offset - 1

@@ -2,11 +2,7 @@ from datetime import date
 from search_ai import search, Filters
 
 
-search_filters = Filters(
-    stock='ORCL',
-    in_title='earnings',
-    after=date(year=2025, month=6, day=10)
-)
+search_filters = Filters(stock='ORCL', in_title='earnings', after=date(year=2025, month=6, day=10))
 
 results = search(mode='news', filters=search_filters, count=8)
 

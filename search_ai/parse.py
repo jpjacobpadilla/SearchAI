@@ -16,10 +16,12 @@ def parse_search(data):
     assert len(title_results) == len(desc_results), 'Error parsing search results'
 
     for title, desc in zip(title_results, desc_results):
-        results.append({
-            'title': title.text_content().strip(),
-            'link':  title.get('href'),
-            'description':  desc.text_content().strip()
-        })
+        results.append(
+            {
+                'title': title.text_content().strip(),
+                'link': title.get('href'),
+                'description': desc.text_content().strip(),
+            }
+        )
 
     return results
