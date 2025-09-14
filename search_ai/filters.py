@@ -161,7 +161,6 @@ class Filters(BaseModel):
 
         filters.append(group_includes(to_list(self.sites), 'site'))
         filters.append(group_includes(to_list(self.tlds), 'site'))
-        filters.append(group_includes(to_list(self.stock), 'stock'))
 
         filters.append(group_includes(to_list(self.filetype), 'filetype'))
         filters.append(group_includes(to_list(self.any_keywords)))
