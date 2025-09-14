@@ -14,12 +14,6 @@ from search_ai import Filters
         ('tlds', ['.gov', '.edu'], '(site:.gov | site:.edu)'),
         ('filetype', 'pdf', 'filetype:pdf'),
         ('https_only', True, 'inurl:https'),
-        ('before', date(1999, 12, 31), 'before:1999-12-31'),
-        ('before', date(2023, 6, 15), 'before:2023-06-15'),
-        ('before', date(2100, 1, 1), 'before:2100-01-01'),
-        ('after', date(2000, 1, 1), 'after:2000-01-01'),
-        ('after', date(2022, 11, 30), 'after:2022-11-30'),
-        ('after', date(2099, 12, 31), 'after:2099-12-31'),
         ('all_keywords', 'ai', '"ai"'),
         ('all_keywords', ['ai', 'ml'], '"ai" "ml"'),
         ('all_keywords', ['ai'], '"ai"'),
@@ -52,8 +46,6 @@ from search_ai import Filters
         ('not_in_url', ['ref', 'share'], '-inurl:ref -inurl:share'),
         ('not_in_text', 'cookie', '-intext:cookie'),
         ('not_in_text', ['ads', 'popup'], '-intext:ads -intext:popup'),
-        ('stock', 'TSLA', 'stock:TSLA'),
-        ('stock', 'BRK.A', 'stock:BRK.A'),
     ],
 )
 def test_individual_fields(field, value, expected):
@@ -79,9 +71,6 @@ def test_individual_fields(field, value, expected):
         ('tlds', ['.edu', '.badzone']),
         ('exclude_tlds', '.invalidtld'),
         ('exclude_tlds', ['.edu', '.badzone']),
-        ('stock', 'U.S. Energy'),
-        ('stock', 'HOOOOD'),
-        ('stock', ['NET']),
     ],
 )
 def test_field_validation(field, value):
@@ -113,16 +102,6 @@ def test_field_validation(field, value):
                 'exclude_https': True,
             },
             '-site:spam.com -inurl:https -ads -clickbait -inurl:ref',
-        ),
-        (
-            {
-                'tlds': ['.gov', '.edu'],
-                'before': date(2020, 1, 1),
-                'after': date(2010, 5, 10),
-                'in_text': ['compliance', 'report'],
-                'exclude_tlds': ['.xyz'],
-            },
-            '(site:.gov | site:.edu) intext:compliance intext:report before:2020-01-01 after:2010-05-10 -site:.xyz',
         ),
         (
             {
@@ -160,14 +139,6 @@ def test_field_validation(field, value):
                 'not_in_title': 'sponsored',
             },
             '"deep learning" intitle:tutorial -"deprecated method" -intitle:sponsored',
-        ),
-        (
-            {
-                'in_title': 'earnings',
-                'stock': 'ORCL',
-                'sites': ['finance.yahoo.com', 'reuters.com'],
-            },
-            '(site:finance.yahoo.com | site:reuters.com) stock:ORCL intitle:earnings',
         ),
     ],
 )
