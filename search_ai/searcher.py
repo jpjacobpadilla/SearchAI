@@ -37,8 +37,11 @@ def search(
 ) -> SearchResults:
     results = SearchResults(results=[], _proxy=proxy)
 
+    compiled_filters = filters.compile_filters()
+    compiled_query = query + f' {compiled_filters}' if compiled_filters else ''
+
     while len(results) < count:
-        response = _request(query, filters, offset, proxy)
+        response = _request(compiled_query, filters, offset, proxy)
         new_results = parse_search(response)
 
         if not new_results:
@@ -66,8 +69,11 @@ async def async_search(
 ) -> AsyncSearchResults:
     results = AsyncSearchResults(results=[], _proxy=proxy)
 
+    compiled_filters = filters.compile_filters()
+    compiled_query = query + f' {compiled_filters}' if compiled_filters else ''
+
     while len(results) < count:
-        response = await _async_request(query, filters, offset, proxy)
+        response = await _async_request(compiled_query, filters, offset, proxy)
         new_results = parse_search(response)
 
         if not new_results:
@@ -88,12 +94,12 @@ async def async_search(
 
 @retry_curl()
 def _request(
-    query: str,
+    compiled_query: str,
     filters: Filters | None,
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {'q': f'{query} {filters.compile_filters() if filters else ""}'}
+    data = {'q': compiled_query}
 
     if offset:
         data['s'] = offset - 1
@@ -113,12 +119,12 @@ def _request(
 
 @retry_curl()
 async def _async_request(
-    query: str,
+    compiled_query: str,
     filters: Filters | None,
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {'q': f'{query} {filters.compile_filters() if filters else ""}'}
+    data = {'q': compiled_query}
 
     if offset:
         data['s'] = offset - 1
