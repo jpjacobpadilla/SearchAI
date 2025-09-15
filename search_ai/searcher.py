@@ -93,7 +93,7 @@ def _request(
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {'q': query + (filters.compile_filters() if filters else '')}
+    data: dict[str, Any] = {'q': f'{query} {filters.compile_filters() if filters else ""}'}
 
     if offset:
         data['s'] = offset - 1
@@ -118,7 +118,7 @@ async def _async_request(
     offset: int,
     proxy: Proxy | None,
 ) -> str:
-    data: dict[str, Any] = {'q': query + (filters.compile_filters() if filters else '')}
+    data: dict[str, Any] = {'q': f'{query} {filters.compile_filters() if filters else ""}'}
 
     if offset:
         data['s'] = offset - 1
