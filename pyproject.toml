@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "search-ai-core"
-version = "2.0.3"
+version = "2.0.4"
 description = "Search the web with advanced filters and LLM-friendly output formats!"
 readme = { file = "README.md", content-type = "text/markdown" }
 requires-python = ">=3.10"

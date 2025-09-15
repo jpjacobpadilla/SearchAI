@@ -36,11 +36,8 @@ def search(
 ) -> SearchResults:
     results = SearchResults(results=[], _proxy=proxy)
 
-    if filters:
-        compiled_filters = filters.compile_filters()
-        compiled_query = query + f' {compiled_filters}' if compiled_filters else ''
-    else:
-        compiled_query = query
+    compiled_filters = filters.compile_filters() if filters else ''
+    compiled_query = query + (f' {compiled_filters}' if compiled_filters else '')
 
     while len(results) < count:
         response = _request(compiled_query, filters, offset, proxy)
@@ -71,11 +68,8 @@ async def async_search(
 ) -> AsyncSearchResults:
     results = AsyncSearchResults(results=[], _proxy=proxy)
 
-    if filters:
-        compiled_filters = filters.compile_filters()
-        compiled_query = query + f' {compiled_filters}' if compiled_filters else ''
-    else:
-        compiled_query = query
+    compiled_filters = filters.compile_filters() if filters else ''
+    compiled_query = query + (f' {compiled_filters}' if compiled_filters else '')
 
     while len(results) < count:
         response = await _async_request(compiled_query, filters, offset, proxy)
