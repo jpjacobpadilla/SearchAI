@@ -1,7 +1,6 @@
 import time
 import random
 import asyncio
-from typing import Literal, Any
 from functools import partial
 
 import curl_cffi as curl
